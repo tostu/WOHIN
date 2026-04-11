@@ -1,7 +1,7 @@
 {
   "ai": "gemini",
   "branch_numbering": "sequential",
-  "here": false,
+  "here": true,
   "integration": "gemini",
   "preset": null,
   "script": "sh",

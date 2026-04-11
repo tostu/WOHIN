@@ -31,7 +31,11 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] **I. Vibe-First**: Does the plan focus on "WHAT" while maintaining structural integrity?
+- [ ] **II. Lifecycle**: Does this plan cover START, BUILD, and SHIP phases?
+- [ ] **III. Independence**: Are user stories broken into independent P1/P2/P3 slices?
+- [ ] **IV. Verification**: Are automated tests (Contract/Integration) planned and prioritized?
+- [ ] **V. Modularity**: Does the implementation prefer extensions over core modifications?
 
 ## Project Structure
 

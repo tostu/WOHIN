@@ -1,50 +1,60 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+Version change: [CONSTITUTION_VERSION] → 1.0.0
+List of modified principles:
+- I. Vibe-First Engineering (Initialized)
+- II. Standardized Lifecycle (Initialized)
+- III. Independent User Stories (Initialized)
+- IV. Automated Verification (Initialized)
+- V. Modular Extension & Plugin Architecture (Initialized)
+Added sections:
+- Quality & Standards
+- Governance & Evolution
+Removed sections:
+- None (Template placeholders replaced)
+Templates requiring updates:
+- .specify/templates/plan-template.md (✅ updated)
+- .specify/templates/spec-template.md (✅ updated)
+- .specify/templates/tasks-template.md (✅ updated)
+- .specify/templates/agent-file-template.md (✅ updated)
+Follow-up TODOs:
+- None
+-->
+
+# WOHIN Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Vibe-First Engineering
+Focus on high-level intent ("WHAT") while the AI handles implementation details ("HOW"). Maintain strict production-grade standards through architectural consistency and design patterns. Implementation must never compromise on structural integrity for the sake of speed.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Standardized Lifecycle (START → BUILD → SHIP)
+All development must follow the START (Discovery/Planning), BUILD (Implementation), and SHIP (Verification/Deployment) phases. No implementation is allowed without a preceding plan; no change is allowed to ship without explicit verification.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Independent User Stories (MVP-Driven)
+Features must be broken into independent, testable user stories with clear priorities (P1, P2, P3). Each story must deliver value as a standalone slice of functionality, allowing for incremental delivery and parallel development.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Automated Verification (NON-NEGOTIABLE)
+Every feature, bug fix, or refactor must be verified by automated tests. Validation is the only path to finality. Contract and integration tests should ideally be written and failed before implementation (TDD approach).
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Modular Extension & Plugin Architecture
+Extend system capabilities through plugins (e.g., Claude Vibes, Speckit) and MCP servers. Core modification is a last resort; prefer composable, decoupled extensions that preserve system stability.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Quality & Standards
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### Code Quality & Security
+- **Standards**: Strict adherence to linting and formatting rules.
+- **Security**: No hardcoded secrets. Use environment variables and approved secret management.
+- **Performance**: Define and track measurable outcomes (SC-XXX) for every feature.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Governance & Evolution
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### Amendments & Compliance
+- **Amendments**: Changes to the constitution require a version bump and synchronization across all templates.
+- **Compliance**: All PRs and plans must be checked against these principles. Use the "Constitution Check" gate in plans to justify deviations.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+The WOHIN Constitution is the ultimate source of truth for engineering practices. All project activities must align with these principles. Amendments are managed through the `.specify/memory/constitution.md` file and require a version increment. Every feature plan MUST include a "Constitution Check" to ensure alignment.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-04-11 | **Last Amended**: 2026-04-11

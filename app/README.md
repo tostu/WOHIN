@@ -15,11 +15,13 @@
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - [Bun](https://bun.sh/)
 - [Sanity CLI](https://www.sanity.io/docs/cli)
 - [Wrangler](https://developers.cloudflare.com/workers/wrangler/)
 
 ### Setup
+
 1. **Clone & Install**: `cd app && bun install`
 2. **Local Environment**: Create `app/.env` (see `app/.env.example`)
 3. **Database**: `bun db:generate && bun db:push`
@@ -34,5 +36,6 @@
 - **Massive Typography**: High contrast between display-lg (Jakarta Sans) and body-md (Vietnam Pro).
 
 ## 📱 PWA Features
+
 - **Offline Mode**: Service Worker caches static assets for "Nap Mode".
 - **Installable**: Full manifest configuration for iOS/Android.

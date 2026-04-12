@@ -22,7 +22,7 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 	// For local development with 'vite dev', platform might be missing
 	// If it is missing, we check if we should throw or provide a mock/local fallback
 	const db = event.platform?.env?.DB;
-	
+
 	if (!db) {
 		if (!building) {
 			console.warn('D1 binding "DB" not found - running in mock/local mode if possible');

@@ -13,9 +13,7 @@ describe('Discovery Search API Contract', () => {
 					distance: 120,
 					rating: 4.5,
 					photos: ['https://example.com/photo1.jpg'],
-					activities: [
-						{ id: 'act1', name: 'study', themeColor: 'matcha' }
-					]
+					activities: [{ id: 'act1', name: 'study', themeColor: 'matcha' }]
 				}
 			]
 		};
@@ -44,9 +42,7 @@ describe('Discovery Search API Contract', () => {
 			hours: [{ day: 'Monday', open: '08:00', close: '20:00' }],
 			description: '<p>A sunny spot for studying.</p>',
 			photos: ['https://example.com/photo1.jpg'],
-			activities: [
-				{ id: 'act1', name: 'study', feedbackCount: 12 }
-			]
+			activities: [{ id: 'act1', name: 'study', feedbackCount: 12 }]
 		};
 
 		expect(response).toMatchObject({

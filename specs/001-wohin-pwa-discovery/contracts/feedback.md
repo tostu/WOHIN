@@ -10,7 +10,7 @@ Submits a thumbs up/down for a location's activity.
 **Request Body**:
 - `locationId`: string (required) - Sanity Location ID
 - `activityId`: string (required) - Sanity Activity ID
-- `vibe`: boolean (required) - true = thumbs up, false = thumbs down
+- `vibe`: string (required) - enum: 'sparkle', 'fire', 'chill', 'nope'
 
 **Response (201 Created)**:
 ```json
@@ -18,7 +18,7 @@ Submits a thumbs up/down for a location's activity.
   "id": "uuid",
   "locationId": "string",
   "activityId": "string",
-  "vibe": "boolean",
+  "vibe": "string",
   "createdAt": "iso-date"
 }
 ```
@@ -35,7 +35,7 @@ Retrieves the current user's submitted feedback for a list of locations.
 ```json
 {
   "feedback": [
-    { "locationId": "string", "activityId": "string", "vibe": "boolean" }
+    { "locationId": "string", "activityId": "string", "vibe": "string" }
   ]
 }
 ```

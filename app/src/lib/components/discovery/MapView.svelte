@@ -23,7 +23,7 @@
 	$effect(() => {
 		if (map && locations.length > 0) {
 			// Clear existing markers if any (simplified)
-			locations.forEach(loc => {
+			locations.forEach((loc) => {
 				// In a real implementation, we would add markers for each location
 				// console.log('Adding marker for:', loc.name);
 			});
@@ -35,4 +35,7 @@
 	});
 </script>
 
-<div class="h-64 w-full overflow-hidden rounded-[2.5rem] bg-surface-container-low shadow-ambient" bind:this={mapContainer}></div>
+<div
+	class="bg-surface-container-low shadow-ambient h-64 w-full overflow-hidden rounded-[2.5rem]"
+	bind:this={mapContainer}
+></div>

@@ -4,44 +4,118 @@
 @import '@fontsource/be-vietnam-pro/index.css';
 
 @theme {
-  --color-surface: #fefcf4;
-  --color-surface-container-low: #fbf9f1;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-high: #f1efdf;
+	/* Radiant Core Palette */
+	--color-sun-cream: #fffdf5;
+	--color-sun-peach: #ffedd5;
+	--color-sun-golden: #fde68a;
+	--color-sun-matcha: #d9f99d;
+	--color-sun-ink: #1c1917;
 
-  --color-matcha: #deffaf;
-  --color-peach: #ff9e6d;
-  --color-sunny: #fdd752;
+	/* Legacy mapping for compatibility */
+	--color-surface: var(--color-sun-cream);
+	--color-matcha: var(--color-sun-matcha);
+	--color-peach: #ff9e6d; /* Keeping for contrast */
+	--color-sunny: var(--color-sun-golden);
 
-  /* Additional colors for tonal shifts */
-  --color-primary-container: #ff9e6d;
-  --color-secondary-container: #fdd752;
-  --color-tertiary-container: #deffaf;
+	/* Typography: Maximalist Scale */
+	--font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+	--font-body: 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif;
 
-  /* Typography */
-  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-body: "Be Vietnam Pro", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+	/* Maximalist Utilities */
+	--shadow-extreme: 0 25px 50px -12px rgba(28, 25, 23, 0.15);
+	--shadow-heavy: 0 10px 15px -3px rgba(28, 25, 23, 0.1), 0 4px 6px -4px rgba(28, 25, 23, 0.1);
+	--radius-xl: 1.5rem;
+	--radius-2xl: 2rem;
+	--radius-3xl: 3rem;
 
-  /* Shadows (Principle II: BUILD) */
-  --shadow-ambient: 0 12px 24px 0 rgba(56, 56, 51, 0.06);
+	/* Animations */
+	@keyframes float {
+		0% {
+			transform: translateY(0px) rotate(0deg);
+		}
+		50% {
+			transform: translateY(-12px) rotate(2deg);
+		}
+		100% {
+			transform: translateY(0px) rotate(0deg);
+		}
+	}
 
-  /* No-Border Rule (Principle I: VIBE) */
-  --border-none: 0;
+	@keyframes pulse-soft {
+		0%,
+		100% {
+			opacity: 1;
+			transform: scale(1);
+		}
+		50% {
+			opacity: 0.8;
+			transform: scale(0.98);
+		}
+	}
+
+	@keyframes fade-up {
+		0% {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		100% {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
 }
 
 :root {
-  --color-surface: #fefcf4;
-  --color-surface-container-low: #fbf9f1;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-high: #f1efdf;
+	--color-surface: var(--color-sun-cream);
+	--color-ink: var(--color-sun-ink);
 }
 
-body {
-  background-color: var(--color-surface);
-  color: #383833;
-  font-family: var(--font-body);
+@layer base {
+	body {
+		@apply bg-sun-cream font-body text-sun-ink antialiased selection:bg-sun-golden selection:text-sun-ink;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		@apply font-display leading-[0.95] font-bold tracking-tight;
+	}
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-display);
+@layer utilities {
+	.glass {
+		@apply border border-white/20 bg-white/40 shadow-heavy backdrop-blur-xl;
+	}
+
+	.glass-dark {
+		@apply border border-sun-ink/5 bg-sun-ink/5 shadow-heavy backdrop-blur-xl;
+	}
+
+	.text-massive {
+		@apply text-6xl font-black tracking-tighter md:text-8xl;
+	}
+
+	.animate-float {
+		animation: float 4s ease-in-out infinite;
+	}
+
+	.animate-pulse-soft {
+		animation: pulse-soft 3s ease-in-out infinite;
+	}
+
+	.animate-fade-up {
+		animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+
+	.card-asymmetric {
+		@apply rounded-[2.5rem] p-8 transition-all duration-300;
+		clip-path: polygon(0% 0%, 100% 2%, 98% 100%, 2% 98%);
+	}
+
+	.card-asymmetric:hover {
+		clip-path: polygon(2% 2%, 98% 0%, 100% 98%, 0% 100%);
+	}
 }

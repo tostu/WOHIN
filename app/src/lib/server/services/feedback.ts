@@ -12,15 +12,17 @@ export interface VibeSubmission {
 export class FeedbackService {
 	static async submitVibe(d1: any, data: VibeSubmission) {
 		const db = getDb(d1);
-		
+
 		// UPSERT: delete existing vibe from this user for this location/activity if any
-		await db.delete(vibeFeedback).where(
-			and(
-				eq(vibeFeedback.userId, data.userId),
-				eq(vibeFeedback.locationId, data.locationId),
-				eq(vibeFeedback.activityId, data.activityId)
-			)
-		);
+		await db
+			.delete(vibeFeedback)
+			.where(
+				and(
+					eq(vibeFeedback.userId, data.userId),
+					eq(vibeFeedback.locationId, data.locationId),
+					eq(vibeFeedback.activityId, data.activityId)
+				)
+			);
 
 		return db.insert(vibeFeedback).values(data).returning();
 	}

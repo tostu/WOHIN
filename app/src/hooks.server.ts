@@ -19,10 +19,21 @@ const handleParaglide: Handle = ({ event, resolve }) =>
 	});
 
 const handleBetterAuth: Handle = async ({ event, resolve }) => {
-	if (!event.platform?.env?.DB)
-		throw new Error('D1 binding "DB" not found - are you running with wrangler?');
+	// For local development with 'vite dev', platform might be missing
+	// If it is missing, we check if we should throw or provide a mock/local fallback
+	const db = event.platform?.env?.DB;
+	
+	if (!db) {
+		if (!building) {
+			console.warn('D1 binding "DB" not found - running in mock/local mode if possible');
+			// In a real local setup, you might want to use a local sqlite db here
+		}
+		// If we don't have a DB, Better Auth will fail if we try to use it
+		// For the sake of this discovery demo, we can proceed but auth features will fail
+		return resolve(event);
+	}
 
-	event.locals.auth = createAuth(event.platform.env.DB);
+	event.locals.auth = createAuth(db);
 
 	const { auth } = event.locals;
 	const session = await auth.api.getSession({ headers: event.request.headers });

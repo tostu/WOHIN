@@ -3,5 +3,12 @@
 	"name": "wohin",
 	"compatibility_date": "2026-04-12",
 	"compatibility_flags": ["nodejs_als"],
-	"pages_build_output_dir": ".svelte-kit/cloudflare"
+	"pages_build_output_dir": ".svelte-kit/cloudflare",
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "wohin-db",
+			"database_id": "8c45f47a-2483-42e1-a3f2-8958742542a2"
+		}
+	]
 }

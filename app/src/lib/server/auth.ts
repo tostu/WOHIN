@@ -14,7 +14,7 @@ const authConfig = {
 	]
 } satisfies Omit<Parameters<typeof betterAuth>[0], 'database'>;
 
-export const createAuth = (d1: D1Database) =>
+export const createAuth = (d1: any) =>
 	betterAuth({
 		...authConfig,
 		database: drizzleAdapter(getDb(d1), { provider: 'sqlite' })

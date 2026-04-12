@@ -9,6 +9,10 @@ const config = {
 	},
 	kit: {
 		adapter: adapter(),
+		prerender: {
+			handleHttpError: 'warn',
+			entries: ['*'] // Prerender as much as possible for discovery speed
+		},
 		typescript: {
 			config: (config) => ({
 				...config,

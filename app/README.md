@@ -1,42 +1,38 @@
-# sv
+# wohin — the radiant curator ✨
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+"wohin" is a sun-drenched, fluid PWA for discovering the best vibes in town. No borders, just tonal shifts, juicy gradients, and playful micro-interactions.
 
-## Creating a project
+## 🛠️ Tech Stack
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Framework**: [SvelteKit 2](https://svelte.dev/) (Svelte 5 Runes)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) with Tonal Layering
+- **Database**: [Cloudflare D1](https://developers.cloudflare.com/d1/) (SQLite) with [Drizzle ORM](https://orm.drizzle.team/)
+- **Auth**: [Better Auth](https://www.better-auth.com/) (Drizzle Adapter)
+- **CMS**: [Sanity.io](https://www.sanity.io/) (Content Delivery)
+- **Typography**: [Fontsource](https://fontsource.org/) (Plus Jakarta Sans Variable, Be Vietnam Pro)
+- **Maps**: [MapLibre GL JS](https://maplibre.org/)
 
-```sh
-# create a new project
-npx sv create my-app
-```
+## 🚀 Getting Started
 
-To recreate this project with the same configuration:
+### Prerequisites
+- [Bun](https://bun.sh/)
+- [Sanity CLI](https://www.sanity.io/docs/cli)
+- [Wrangler](https://developers.cloudflare.com/workers/wrangler/)
 
-```sh
-# recreate this project
-bun x sv@0.15.1 create --template minimal --types ts --add prettier eslint vitest="usages:unit,component" playwright tailwindcss="plugins:none" sveltekit-adapter="adapter:cloudflare+cfTarget:pages" drizzle="database:d1" better-auth="demo:password" mdsvex paraglide="languageTags:de, en+demo:no" mcp="ide:claude-code,gemini,opencode,vscode+setup:remote" --install bun wohin
-```
+### Setup
+1. **Clone & Install**: `cd app && bun install`
+2. **Local Environment**: Create `app/.env` (see `app/.env.example`)
+3. **Database**: `bun db:generate && bun db:push`
+4. **Development**: `bun dev` (Discovery mode)
+5. **Wrangler Proxy**: To use D1 and Better Auth locally, use `wrangler pages dev` or `bun preview`.
 
-## Developing
+## 🎨 Design Philosophy (The Radiant Curator)
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+- **Strict No-Border Rule**: We use background tonal shifts to separate surfaces.
+- **Tonal Layering**: `surface`, `surface-container-low`, `surface-container-high`.
+- **Whimsy & Delight**: Animated empty states and "Vibe Check" feedback loops.
+- **Massive Typography**: High contrast between display-lg (Jakarta Sans) and body-md (Vietnam Pro).
 
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## 📱 PWA Features
+- **Offline Mode**: Service Worker caches static assets for "Nap Mode".
+- **Installable**: Full manifest configuration for iOS/Android.

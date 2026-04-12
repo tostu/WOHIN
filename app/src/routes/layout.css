@@ -1,1 +1,47 @@
 @import 'tailwindcss';
+
+@import '@fontsource-variable/plus-jakarta-sans/index.css';
+@import '@fontsource/be-vietnam-pro/index.css';
+
+@theme {
+  --color-surface: #fefcf4;
+  --color-surface-container-low: #fbf9f1;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #f1efdf;
+
+  --color-matcha: #deffaf;
+  --color-peach: #ff9e6d;
+  --color-sunny: #fdd752;
+
+  /* Additional colors for tonal shifts */
+  --color-primary-container: #ff9e6d;
+  --color-secondary-container: #fdd752;
+  --color-tertiary-container: #deffaf;
+
+  /* Typography */
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-body: "Be Vietnam Pro", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  /* Shadows (Principle II: BUILD) */
+  --shadow-ambient: 0 12px 24px 0 rgba(56, 56, 51, 0.06);
+
+  /* No-Border Rule (Principle I: VIBE) */
+  --border-none: 0;
+}
+
+:root {
+  --color-surface: #fefcf4;
+  --color-surface-container-low: #fbf9f1;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #f1efdf;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: #383833;
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}

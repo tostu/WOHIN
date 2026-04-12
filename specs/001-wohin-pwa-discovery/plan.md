@@ -1,108 +1,67 @@
-# Implementation Plan: [FEATURE]
+# Implementation Plan: wohin-pwa-discovery (Sun-Drenched Social Edition)
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
+**Branch**: `001-wohin-pwa-discovery` | **Date**: 2026-04-12 | **Spec**: [/specs/001-wohin-pwa-discovery/spec.md](/specs/001-wohin-pwa-discovery/spec.md)
+**Input**: Feature specification + "The Radiant Curator" Design System Strategy
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Build "wohin", a SvelteKit-powered PWA that functions as a "Radiant Curator" for location discovery. The application follows a "Sun-Drenched Social" design system, rejecting traditional grid/border models for a fluid, tonal layering system. Key features include activity-based discovery (study, relax, party), interactive MapLibre integration, and a delightfully animated "Vibe Check" feedback system. The aesthetic is defined by warm, sun-filled tones, editorial typography (Plus Jakarta Sans & Be Vietnam Pro), organic, asymmetrical layouts, and playful microcopy that injects personality into every interaction.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: SvelteKit 2 (TypeScript 5.x)
+**Primary Dependencies**: Tailwind CSS (Custom Theme), Bits UI (Radix Svelte), MapLibre GL JS, Sanity Client
+**Typography**: Plus Jakarta Sans (Display/Headlines), Be Vietnam Pro (Body/Titles)
+**Color Palette**: Background `#fefcf4` (Cream), Accents in Peach, Golden Yellow, and Matcha Green.
+**Storage**: Sanity CMS (Content), PostgreSQL (Drizzle ORM for Feedback), Service Worker (PWA)
+**Testing**: Vitest, Playwright (E2E + PWA validation)
+**Target Platform**: Modern Browsers (PWA), iOS/Android
+**Performance Goals**: SSG for public pages, < 2s TTI, Lighthouse Accessibility >= 90
+**Constraints**: **Strict No-Border Rule** (use tonal shifts), WCAG 2.1 AA compliant, Responsive/Fluid layout.
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
-
-- [ ] **I. Vibe-First**: Does the plan focus on "WHAT" while maintaining structural integrity?
-- [ ] **II. Lifecycle**: Does this plan cover START, BUILD, and SHIP phases?
-- [ ] **III. Independence**: Are user stories broken into independent P1/P2/P3 slices?
-- [ ] **IV. Verification**: Are automated tests (Contract/Integration) planned and prioritized?
-- [ ] **V. Modularity**: Does the implementation prefer extensions over core modifications?
+- [x] **I. Vibe-First**: Focuses on "The Radiant Curator" intent while maintaining structural integrity.
+- [x] **II. Lifecycle**: Covers START, BUILD, and SHIP phases.
+- [x] **III. Independence**: Stories prioritized as P1 (Discovery), P2 (Feedback), P3 (Submissions).
+- [x] **IV. Verification**: Automated tests planned for all core flows.
+- [x] **V. Modularity**: Uses Svelte components and decoupled Sanity architecture.
+- [x] **VI. Decoupled Architecture**: External services abstracted behind interfaces.
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/[###-feature]/
-├── plan.md              # This file (/speckit.plan command output)
-├── research.md          # Phase 0 output (/speckit.plan command)
-├── data-model.md        # Phase 1 output (/speckit.plan command)
-├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output (/speckit.plan command)
-└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+specs/001-wohin-pwa-discovery/
+├── plan.md              # This file
+├── research.md          # Phase 0 output
+├── data-model.md        # Phase 1 output
+├── quickstart.md        # Phase 1 output
+├── contracts/           # Phase 1 output
+└── tasks.md             # Phase 2 output (generated later)
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
+app/
 ├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
+│   ├── lib/
+│   │   ├── components/  # Bits UI primitives + Custom "Sun-Drenched" components
+│   │   ├── styles/      # global.css (Custom Properties), tailwind.config.ts
+│   │   └── server/      # Sanity/DB services
+│   └── routes/
+│       ├── (app)/       # PWA Discovery flows
+│       └── (admin)/     # Moderation interface
+├── static/              # Manifest, PWA icons
 └── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Hybrid app structure with centralized styling to enforce the "No-Line" rule and tonal layering system.
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
-
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+| N/A | | |

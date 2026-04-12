@@ -22,18 +22,19 @@ As a user, I want to find locations based on my current intention (e.g., "study"
 
 ---
 
-### User Story 2 - Vibe Feedback (Priority: P2)
+### User Story 2 - The Vibe Check (Priority: P2)
 
-As a registered user, I want to submit a thumbs up/down "vibe" for a location's activity, so that I can contribute to the community's assessment of that spot.
+As a registered user, I want to drop a playful "Vibe Check" (e.g., interactive, floating emojis that celebrate my choice instead of a clinical thumbs up/down) for a location's activity, so that I can delightfully contribute to the community's pulse of that spot.
 
-**Why this priority**: Essential for data quality and community engagement, but secondary to the primary discovery function.
+**Why this priority**: Essential for data quality and community engagement. By adding an element of micro-interaction delight, we increase the likelihood of users leaving feedback.
 
-**Independent Test**: A logged-in user can navigate to a location profile and submit a "thumbs up" for the current activity.
+**Independent Test**: A logged-in user can navigate to a location profile, trigger a delightfully animated "Vibe Check" for an activity, and see an immediate visual celebration.
 
 **Acceptance Scenarios**:
 
-1. **Given** I am logged into an account, **When** I view a location profile, **Then** I see options to provide vibe feedback for its activities.
-2. **Given** I have submitted feedback, **When** I revisit the location, **Then** my previous feedback is reflected/editable.
+1. **Given** I am logged into an account, **When** I view a location profile, **Then** I see inviting, tactile options to drop a Vibe Check for its activities.
+2. **Given** I hover or click a Vibe Check, **Then** I am rewarded with a playful micro-interaction (like a sparkle or gentle bounce).
+3. **Given** I have submitted feedback, **When** I revisit the location, **Then** my previous vibe is reflected with a personalized, warm indicator.
 
 ---
 
@@ -54,9 +55,9 @@ As a user, I want to submit a new location or report a problem with existing dat
 
 ### Edge Cases
 
-- **No Results**: What happens when no locations match the selected activity within a reasonable distance? (Show a "No results found" message with suggestions to try other activities or expand search).
-- **Offline Access**: How does the PWA handle sudden loss of connectivity? (Cache previously viewed locations and show a "You are offline" banner).
-- **Incomplete Submission**: User submits a location with missing required fields. (Highlight missing fields and prevent submission).
+- **No Results (The Undiscovered Vibe)**: What happens when no locations match the selected activity? (Show a playful empty state with whimsical microcopy, e.g., "This vibe is still undiscovered territory! 🗺️" alongside an engaging illustration and suggestions).
+- **Offline Access (The Nap Mode)**: How does the PWA handle sudden loss of connectivity? (Cache previously viewed locations and show a warm "Looks like the Wi-Fi is taking a quick nap 💤" banner, ensuring users don't feel abruptly disconnected).
+- **Incomplete Submission (The Gentle Nudge)**: User submits a location with missing required fields. (Provide friendly, dynamic validation—e.g., "This spot sounds cool, but it's a bit shy! Mind adding the missing info? ✨").
 
 ## Requirements *(mandatory)*
 
@@ -69,6 +70,7 @@ As a user, I want to submit a new location or report a problem with existing dat
 - **FR-005**: System MUST include a moderation queue where new location submissions are held until approved by an admin.
 - **FR-006**: System MUST provide a global "Report a Problem" feature for data corrections.
 - **FR-007**: System MUST be responsive and accessible (WCAG 2.1 AA compliant).
+- **FR-008**: System MUST integrate a "Whimsy & Delight" framework, including joyful success animations, thoughtful empty states, and warm microcopy across all error boundaries (while respecting reduced motion settings).
 
 ### Key Entities
 

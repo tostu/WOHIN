@@ -2,7 +2,7 @@
 
 Auto-generated from all feature plans. Last updated: [DATE]
 
-**Note**: All development must strictly adhere to the **WOHIN Constitution** (v1.0.0).
+**Note**: All development must strictly adhere to the **WOHIN Constitution** (v1.1.0).
 
 ## Core Principles (Summary)
 
@@ -11,6 +11,7 @@ Auto-generated from all feature plans. Last updated: [DATE]
 - **III. Independence**: Break features into P1/P2/P3 user stories.
 - **IV. Verification**: Mandatory automated tests (write and fail first).
 - **V. Modularity**: Prefer plugins and extensions.
+- **VI. Decoupled Architecture**: Abstraction and DI for external services.
 
 ## Active Technologies
 

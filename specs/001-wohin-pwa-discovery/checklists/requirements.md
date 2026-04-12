@@ -31,4 +31,4 @@
 
 ## Notes
 
-- Initial validation passed. No [NEEDS CLARIFICATION] markers were used as reasonable defaults were applied (e.g., standard email/password auth, manual moderation interface).
+- Updated: Removed "privacy-first" and explicit anonymous-only discovery requirements as per user request. Discovery features remain accessible without mandatory accounts, but are no longer framed as a privacy-centric USP.

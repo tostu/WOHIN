@@ -1,21 +1,16 @@
 <!--
 Sync Impact Report
-Version change: [CONSTITUTION_VERSION] → 1.0.0
+Version change: 1.0.0 → 1.1.0
 List of modified principles:
-- I. Vibe-First Engineering (Initialized)
-- II. Standardized Lifecycle (Initialized)
-- III. Independent User Stories (Initialized)
-- IV. Automated Verification (Initialized)
-- V. Modular Extension & Plugin Architecture (Initialized)
+- None (Added Principle VI)
 Added sections:
-- Quality & Standards
-- Governance & Evolution
+- VI. Decoupled Service Architecture
 Removed sections:
-- None (Template placeholders replaced)
+- None
 Templates requiring updates:
 - .specify/templates/plan-template.md (✅ updated)
-- .specify/templates/spec-template.md (✅ updated)
 - .specify/templates/tasks-template.md (✅ updated)
+- .specify/templates/spec-template.md (✅ verified)
 - .specify/templates/agent-file-template.md (✅ updated)
 Follow-up TODOs:
 - None
@@ -40,6 +35,9 @@ Every feature, bug fix, or refactor must be verified by automated tests. Validat
 ### V. Modular Extension & Plugin Architecture
 Extend system capabilities through plugins (e.g., Claude Vibes, Speckit) and MCP servers. Core modification is a last resort; prefer composable, decoupled extensions that preserve system stability.
 
+### VI. Decoupled Service Architecture
+External dependencies (APIs, databases, third-party services) must be abstracted behind interfaces. Use dependency injection (similar to Spring Boot patterns) to ensure modules remain decoupled, testable, and swappable.
+
 ## Quality & Standards
 
 ### Code Quality & Security
@@ -57,4 +55,4 @@ Extend system capabilities through plugins (e.g., Claude Vibes, Speckit) and MCP
 
 The WOHIN Constitution is the ultimate source of truth for engineering practices. All project activities must align with these principles. Amendments are managed through the `.specify/memory/constitution.md` file and require a version increment. Every feature plan MUST include a "Constitution Check" to ensure alignment.
 
-**Version**: 1.0.0 | **Ratified**: 2026-04-11 | **Last Amended**: 2026-04-11
+**Version**: 1.1.0 | **Ratified**: 2026-04-11 | **Last Amended**: 2026-04-12

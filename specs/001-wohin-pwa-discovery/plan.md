@@ -36,7 +36,6 @@
 - [ ] **III. Independence**: Are user stories broken into independent P1/P2/P3 slices?
 - [ ] **IV. Verification**: Are automated tests (Contract/Integration) planned and prioritized?
 - [ ] **V. Modularity**: Does the implementation prefer extensions over core modifications?
-- [ ] **VI. Decoupled Architecture**: Are external services (APIs, DBs) abstracted behind interfaces with dependency injection?
 
 ## Project Structure
 

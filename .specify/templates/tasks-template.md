@@ -8,7 +8,7 @@ description: "Task list template for feature implementation"
 **Input**: Design documents from `/specs/[###-feature-name]/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Note**: All tasks must align with the **WOHIN Constitution** (Principles I-V).
+**Note**: All tasks must align with the **WOHIN Constitution** (Principles I-VI).
 
 **Verification**: Automated tests (Contract/Integration) are MANDATORY (Principle IV) and must be written FIRST.
 

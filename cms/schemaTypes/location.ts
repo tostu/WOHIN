@@ -38,6 +38,14 @@ export default defineType({
       of: [{ type: 'block' }],
     }),
     defineField({
+      name: 'image',
+      title: 'Main Image',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+    }),
+    defineField({
       name: 'photos',
       title: 'Photos',
       type: 'array',

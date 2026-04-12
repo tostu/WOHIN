@@ -144,6 +144,6 @@
 	</article>
 {:else}
 	<div class="flex h-screen items-center justify-center">
-		<p class="animate-pulse font-bold text-peach">Loading the magic... ✨</p>
+		<p class="text-peach animate-pulse font-bold">Loading the magic... ✨</p>
 	</div>
 {/if}

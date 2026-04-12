@@ -4,26 +4,20 @@
 @import '@fontsource/be-vietnam-pro/index.css';
 
 @theme {
-	/* Radiant Core Palette */
-	--color-sun-cream: #fffdf5;
-	--color-sun-peach: #ffedd5;
-	--color-sun-golden: #fde68a;
-	--color-sun-matcha: #d9f99d;
-	--color-sun-ink: #1c1917;
-
-	/* Legacy mapping for compatibility */
-	--color-surface: var(--color-sun-cream);
-	--color-matcha: var(--color-sun-matcha);
-	--color-peach: #ff9e6d; /* Keeping for contrast */
-	--color-sunny: var(--color-sun-golden);
+	/* Electric Bubblegum Palette */
+	--color-surface: #fdf2f8;
+	--color-primary: #f472b6;
+	--color-secondary: #f9a8d4;
+	--color-accent: #a7f3d0;
+	--color-ink: #312e81;
 
 	/* Typography: Maximalist Scale */
 	--font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
 	--font-body: 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif;
 
 	/* Maximalist Utilities */
-	--shadow-extreme: 0 25px 50px -12px rgba(28, 25, 23, 0.15);
-	--shadow-heavy: 0 10px 15px -3px rgba(28, 25, 23, 0.1), 0 4px 6px -4px rgba(28, 25, 23, 0.1);
+	--shadow-extreme: 0 25px 50px -12px rgba(49, 46, 129, 0.15);
+	--shadow-heavy: 0 10px 15px -3px rgba(49, 46, 129, 0.1), 0 4px 6px -4px rgba(49, 46, 129, 0.1);
 	--radius-xl: 1.5rem;
 	--radius-2xl: 2rem;
 	--radius-3xl: 3rem;
@@ -33,9 +27,11 @@
 		0% {
 			transform: translateY(0px) rotate(0deg);
 		}
+
 		50% {
 			transform: translateY(-12px) rotate(2deg);
 		}
+
 		100% {
 			transform: translateY(0px) rotate(0deg);
 		}
@@ -47,6 +43,7 @@
 			opacity: 1;
 			transform: scale(1);
 		}
+
 		50% {
 			opacity: 0.8;
 			transform: scale(0.98);
@@ -58,6 +55,7 @@
 			opacity: 0;
 			transform: translateY(20px);
 		}
+
 		100% {
 			opacity: 1;
 			transform: translateY(0);
@@ -65,14 +63,9 @@
 	}
 }
 
-:root {
-	--color-surface: var(--color-sun-cream);
-	--color-ink: var(--color-sun-ink);
-}
-
 @layer base {
 	body {
-		@apply bg-sun-cream font-body text-sun-ink antialiased selection:bg-sun-golden selection:text-sun-ink;
+		@apply bg-surface font-body text-ink antialiased selection:bg-primary selection:text-ink;
 	}
 
 	h1,
@@ -91,7 +84,7 @@
 	}
 
 	.glass-dark {
-		@apply border border-sun-ink/5 bg-sun-ink/5 shadow-heavy backdrop-blur-xl;
+		@apply border border-ink/5 bg-ink/5 shadow-heavy backdrop-blur-xl;
 	}
 
 	.text-massive {

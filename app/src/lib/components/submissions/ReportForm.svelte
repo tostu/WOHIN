@@ -36,7 +36,7 @@
 			bind:value={description}
 			required
 			placeholder="Wrong address, closed, or something else?"
-			class="bg-surface-container-low h-32 w-full resize-none rounded-[1.5rem] px-6 py-4 text-neutral-800 placeholder-neutral-400 shadow-sm focus:ring-2 focus:ring-peach focus:outline-none"
+			class="bg-surface-container-low focus:ring-peach h-32 w-full resize-none rounded-[1.5rem] px-6 py-4 text-neutral-800 placeholder-neutral-400 shadow-sm focus:ring-2 focus:outline-none"
 		></textarea>
 	</div>
 

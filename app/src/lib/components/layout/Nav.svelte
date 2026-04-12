@@ -28,8 +28,8 @@
 		<a
 			href={localizeHref(link.href)}
 			class="flex h-16 w-16 flex-col items-center justify-center rounded-2xl transition-all duration-300 {active
-				? 'bg-sun-golden text-sun-ink shadow-heavy'
-				: 'text-sun-ink/40 hover:bg-sun-peach/20 hover:text-sun-ink/60'}"
+				? 'bg-primary text-ink shadow-heavy'
+				: 'text-ink/40 hover:bg-secondary/20 hover:text-ink/60'}"
 		>
 			<Icon class="h-6 w-6" strokeWidth={active ? 2.5 : 2} />
 			<span class="mt-1 text-[10px] font-black tracking-tighter uppercase">

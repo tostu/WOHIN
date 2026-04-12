@@ -12,6 +12,12 @@
 
 	const emojiOptions = ['✨', '🔥', '🌿', '🍵', '🌞', '💖'];
 
+	const themeMap: Record<string, string> = {
+		matcha: 'accent',
+		peach: 'secondary',
+		sunny: 'primary'
+	};
+
 	function handleFeedback(emoji: string) {
 		const id = nextFeedbackId++;
 		feedbacks = [...feedbacks, { id, emoji }];
@@ -42,16 +48,18 @@
 						class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
 					/>
 				{:else}
-					<div class="flex h-full w-full items-center justify-center bg-sun-peach/20">
-						<MapPin class="h-12 w-12 text-sun-ink/20" />
+					<div class="flex h-full w-full items-center justify-center bg-secondary/20">
+						<MapPin class="h-12 w-12 text-ink/20" />
 					</div>
 				{/if}
 
 				<!-- Vibe Tag Overlay -->
 				{#if location.activities[0]}
 					<div
-						class="absolute bottom-4 left-4 rounded-xl bg-white/90 px-3 py-1.5 text-[10px] font-black tracking-widest text-sun-ink uppercase shadow-heavy backdrop-blur-md"
-						style="background-color: var(--color-sun-{location.activities[0].themeColor})"
+						class="absolute bottom-4 left-4 rounded-xl bg-white/90 px-3 py-1.5 text-[10px] font-black tracking-widest text-ink uppercase shadow-heavy backdrop-blur-md"
+						style="background-color: var(--color-{themeMap[location.activities[0].themeColor] ||
+							location.activities[0].themeColor ||
+							'secondary'})"
 					>
 						{location.activities[0].name}
 					</div>
@@ -61,17 +69,17 @@
 			<!-- Content Section -->
 			<div class="flex flex-1 flex-col justify-center py-2">
 				<div class="mb-2 flex items-start justify-between">
-					<h3 class="font-display text-2xl leading-tight font-black text-sun-ink">
+					<h3 class="font-display text-2xl leading-tight font-black text-ink">
 						{location.name}
 					</h3>
 					<div
-						class="flex items-center gap-1 rounded-full bg-sun-golden/20 px-2 py-1 text-[10px] font-black text-sun-ink"
+						class="flex items-center gap-1 rounded-full bg-primary/20 px-2 py-1 text-[10px] font-black text-ink"
 					>
 						⭐ {location.rating || '4.5'}
 					</div>
 				</div>
 
-				<p class="mb-4 flex items-center gap-1 text-sm font-medium text-sun-ink/40">
+				<p class="mb-4 flex items-center gap-1 text-sm font-medium text-ink/40">
 					<MapPin class="h-3 w-3" />
 					{location.address || 'Berlin, Germany'}
 				</p>
@@ -81,14 +89,14 @@
 					<div class="flex -space-x-2">
 						{#each ['✨', '🍵', '🌿'] as emoji, i}
 							<div
-								class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-sun-peach/20 text-sm shadow-sm"
+								class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-secondary/20 text-sm shadow-sm"
 								style="z-index: {10 - i}"
 							>
 								{emoji}
 							</div>
 						{/each}
 						<div
-							class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-sun-golden/40 text-[10px] font-black text-sun-ink"
+							class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-primary/40 text-[10px] font-black text-ink"
 						>
 							+12
 						</div>
@@ -96,16 +104,16 @@
 
 					<div class="flex gap-2">
 						<button
-							class="flex h-10 w-10 items-center justify-center rounded-full bg-sun-peach/20 text-sun-ink transition-colors hover:bg-sun-peach/40"
+							class="flex h-10 w-10 items-center justify-center rounded-full bg-secondary/20 text-ink transition-colors hover:bg-secondary/40"
 							onclick={(e) => {
 								e.preventDefault();
 								showEmojis = !showEmojis;
 							}}
 						>
-							<Heart class="h-5 w-5 {showEmojis ? 'fill-sun-ink' : ''}" />
+							<Heart class="h-5 w-5 {showEmojis ? 'fill-ink' : ''}" />
 						</button>
 						<button
-							class="flex h-10 w-10 items-center justify-center rounded-full bg-sun-peach/20 text-sun-ink transition-colors hover:bg-sun-peach/40"
+							class="flex h-10 w-10 items-center justify-center rounded-full bg-secondary/20 text-ink transition-colors hover:bg-secondary/40"
 						>
 							<Share2 class="h-5 w-5" />
 						</button>

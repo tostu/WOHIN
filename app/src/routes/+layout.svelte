@@ -20,13 +20,13 @@
 <header class="glass sticky top-0 z-50 flex items-center justify-between px-6 py-4">
 	<div class="flex items-center gap-3">
 		<div
-			class="animate-float flex h-12 w-12 items-center justify-center rounded-full bg-sun-golden shadow-heavy"
+			class="animate-float flex h-12 w-12 items-center justify-center rounded-full bg-primary shadow-heavy"
 		>
-			<Sun class="h-7 w-7 text-sun-ink" />
+			<Sun class="h-7 w-7 text-ink" />
 		</div>
 		<div>
-			<h1 class="font-display text-2xl font-black tracking-tight text-sun-ink">WOHIN</h1>
-			<p class="text-[10px] font-bold tracking-[0.2em] text-sun-ink/40 uppercase">
+			<h1 class="font-display text-2xl font-black tracking-tight text-ink">WOHIN</h1>
+			<p class="text-[10px] font-bold tracking-[0.2em] text-ink/40 uppercase">
 				The Radiant Curator
 			</p>
 		</div>

@@ -8,10 +8,13 @@
 		onSelect(id);
 	}
 
-	const colorMap = {
-		matcha: 'bg-sun-matcha hover:bg-sun-matcha/80',
-		peach: 'bg-sun-peach hover:bg-sun-peach/80',
-		sunny: 'bg-sun-golden hover:bg-sun-golden/80'
+	const colorMap: Record<string, string> = {
+		matcha: 'bg-accent hover:bg-accent/80',
+		peach: 'bg-secondary hover:bg-secondary/80',
+		sunny: 'bg-primary hover:bg-primary/80',
+		primary: 'bg-primary hover:bg-primary/80',
+		secondary: 'bg-secondary hover:bg-secondary/80',
+		accent: 'bg-accent hover:bg-accent/80'
 	};
 
 	type ThemeColor = keyof typeof colorMap;
@@ -22,9 +25,9 @@
 		{@const active = selectedActivityId === activity.id}
 		<button
 			onclick={() => select(activity.id)}
-			class="flex items-center gap-3 rounded-2xl border-2 border-sun-ink px-6 py-3 text-sm font-black tracking-widest uppercase transition-all duration-300 active:scale-90 {active
+			class="flex items-center gap-3 rounded-2xl border-2 border-ink px-6 py-3 text-sm font-black tracking-widest uppercase transition-all duration-300 active:scale-90 {active
 				? colorMap[activity.themeColor as ThemeColor] + ' scale-105 -rotate-2 shadow-heavy'
-				: 'bg-white text-sun-ink hover:-translate-y-1 hover:shadow-heavy'}"
+				: 'bg-white text-ink hover:-translate-y-1 hover:shadow-heavy'}"
 		>
 			{#if activity.icon}
 				<span class="text-xl leading-none">{activity.icon}</span>

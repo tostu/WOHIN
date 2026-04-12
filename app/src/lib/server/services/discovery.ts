@@ -64,6 +64,31 @@ export class DiscoveryService {
 		}));
 	}
 
+	static async getFeaturedLocations(limit: number = 10): Promise<LocationSearchResult[]> {
+		const query = `*[_type == "location" && status == "approved"] | order(_createdAt desc)[0...$limit]{
+			"id": _id,
+			name,
+			"slug": slug.current,
+			address,
+			"photos": photos[].asset->url,
+			"activities": activities[]->{
+				"id": _id,
+				name,
+				"slug": slug.current,
+				themeColor,
+				icon
+			}
+		}`;
+
+		const locations = await sanityClient.fetch(query, { limit });
+
+		return locations.map((loc: any) => ({
+			...loc,
+			distance: 0,
+			rating: 4.8 // Placeholder
+		}));
+	}
+
 	static async getLocationBySlug(slug: string) {
 		const query = `*[_type == "location" && slug.current == $slug][0]{
 			"id": _id,

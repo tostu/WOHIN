@@ -46,7 +46,6 @@
 						src={location.image || location.photos![0]}
 						alt={location.name}
 						class="h-full w-full object-cover transition-all duration-700 will-change-transform group-hover:scale-110"
-						style:view-transition-name="location-image-{location.slug}"
 					/>
 				{:else}
 					<div class="flex h-full w-full items-center justify-center bg-secondary/20">

@@ -6,11 +6,37 @@
 
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<meta name="theme-color" content="#ff9e6d" />
+
 		<meta name="text-scale" content="scale" />
 		%sveltekit.head%
+		<script>
+			// Force standalone mode to stay in the app on iOS
+			(function (a, b, c) {
+				if (c in b && b[c]) {
+					var d,
+						e = a.location,
+						f = /^(a|html)$/i;
+					a.addEventListener(
+						'click',
+						function (a) {
+							d = a.target;
+							while (!f.test(d.nodeName)) d = d.parentNode;
+							if ('href' in d && (d.href.indexOf('http') || ~d.href.indexOf(e.host)) && d.target !== '_blank') {
+								a.preventDefault();
+								e.href = d.href;
+							}
+						},
+						false
+					);
+				}
+			})(document, window.navigator, 'standalone');
+		</script>
 	</head>
 
-	<body data-sveltekit-preload-data="hover">
+	<body data-sveltekit-preload-data="tap">
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

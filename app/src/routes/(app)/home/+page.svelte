@@ -143,7 +143,6 @@
 								src={spot.image || spot.photos![0]}
 								alt={spot.name}
 								class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-								style:view-transition-name="location-image-{spot.slug}"
 							/>
 						{:else}
 							<div class="absolute inset-0 bg-gradient-to-br from-peach to-sunny"></div>
@@ -191,7 +190,6 @@
 									src={spot.image || spot.photos![0]}
 									alt={spot.name}
 									class="h-full w-full object-cover"
-									style:view-transition-name="location-image-{spot.slug}"
 								/>
 							{:else}
 								<div
@@ -240,7 +238,6 @@
 									src={arrival.image || arrival.photos![0]}
 									alt={arrival.name}
 									class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-									style:view-transition-name="location-image-{arrival.slug}"
 								/>
 							{:else}
 								<span class="text-2xl">{arrival.activities[0]?.icon || '📍'}</span>

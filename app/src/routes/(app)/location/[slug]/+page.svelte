@@ -59,7 +59,6 @@
 					src={location.image || location.photos![0]}
 					alt={location.name}
 					class="h-full w-full object-cover"
-					style:view-transition-name="location-image-{location.slug}"
 				/>
 			{:else}
 				<div class="bg-surface-container-high flex h-full w-full items-center justify-center">

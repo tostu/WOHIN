@@ -8,12 +8,17 @@
 	let initialVibeHistory = $derived(data.vibeHistory || []);
 	let selectedActivityId = $state<string | null>(null);
 
-	// Local state for optimistic updates
+	// Local state for optimistic updates and client-side fetching
 	let vibeHistory = $state<any[]>([]);
 
 	$effect(() => {
-		if (initialVibeHistory) {
-			vibeHistory = [...initialVibeHistory];
+		if (location?.id) {
+			fetch(`/api/v1/feedback/location/${location.id}`)
+				.then((res) => res.json())
+				.then((data) => {
+					vibeHistory = data;
+				})
+				.catch(console.error);
 		}
 	});
 
@@ -25,16 +30,14 @@
 
 	function handleVibe(vibe: string) {
 		// Optimistic update
-		vibeHistory = [
-			...vibeHistory,
-			{
-				id: Math.random().toString(),
-				locationId: location.id,
-				activityId: selectedActivityId,
-				vibe: vibe,
-				createdAt: new Date().toISOString()
-			}
-		];
+		const newVibe = {
+			id: Math.random().toString(),
+			locationId: location.id,
+			activityId: selectedActivityId,
+			vibe: vibe,
+			createdAt: new Date().toISOString()
+		};
+		vibeHistory = [...vibeHistory, newVibe];
 	}
 
 	let vibeCounts = $derived.by(() => {

@@ -19,9 +19,19 @@ const handleParaglide: Handle = ({ event, resolve }) =>
 	});
 
 const handleBetterAuth: Handle = async ({ event, resolve }) => {
+	if (building) {
+		return resolve(event);
+	}
+
 	// For local development with 'vite dev', platform might be missing
-	// If it is missing, we check if we should throw or provide a mock/local fallback
-	const db = event.platform?.env?.DB;
+	// We wrap this in a try/catch because the Cloudflare adapter throws
+	// "Cannot access platform.env.DB in a prerenderable route" on static routes.
+	let db;
+	try {
+		db = event.platform?.env?.DB;
+	} catch (e) {
+		// Ignore error on prerenderable routes
+	}
 
 	if (!db) {
 		if (!building) {

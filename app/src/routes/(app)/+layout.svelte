@@ -10,7 +10,7 @@
 
 <div class="relative z-10 min-h-screen text-ink">
 	<div
-		class="relative mx-auto flex min-h-screen max-w-2xl flex-col bg-white/40 backdrop-blur-3xl md:border-x md:border-ink/5 md:shadow-2xl"
+		class="relative mx-auto flex min-h-screen max-w-2xl flex-col bg-white/40 backdrop-blur-xl md:border-x md:border-ink/5 md:shadow-2xl md:backdrop-blur-3xl"
 	>
 		<Header />
 

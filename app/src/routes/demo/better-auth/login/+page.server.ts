@@ -4,6 +4,8 @@ import type { PageServerLoad } from './$types';
 
 import { APIError } from 'better-auth/api';
 
+export const prerender = false;
+
 export const load: PageServerLoad = (event) => {
 	if (event.locals.user) {
 		return redirect(302, '/demo/better-auth');

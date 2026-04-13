@@ -44,8 +44,8 @@ export class DiscoveryService {
 			name,
 			"slug": slug.current,
 			address,
-			"image": image.asset->url,
-			"photos": photos[].asset->url,
+			"image": image.asset->url + "?w=800&q=80&auto=format",
+			"photos": photos[].asset->url + "?w=800&q=80&auto=format",
 			"activities": activities[]->{
 				"id": _id,
 				name,
@@ -72,8 +72,8 @@ export class DiscoveryService {
 			name,
 			"slug": slug.current,
 			address,
-			"image": image.asset->url,
-			"photos": photos[].asset->url,
+			"image": image.asset->url + "?w=800&q=80&auto=format",
+			"photos": photos[].asset->url + "?w=800&q=80&auto=format",
 			"activities": activities[]->{
 				"id": _id,
 				name,
@@ -101,8 +101,8 @@ export class DiscoveryService {
 			coordinates,
 			hours,
 			description,
-			"image": image.asset->url,
-			"photos": photos[].asset->url,
+			"image": image.asset->url + "?w=1200&q=85&auto=format",
+			"photos": photos[].asset->url + "?w=1200&q=85&auto=format",
 			"activities": activities[]->{
 				"id": _id,
 				name,

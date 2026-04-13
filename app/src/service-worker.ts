@@ -30,8 +30,24 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
 	if (event.request.method !== 'GET') return;
 
+	const url = new URL(event.request.url);
+
+	// Bypass service worker for Vite internal requests and Svelte compiler requests
+	// These are common in development and can cause significant overhead/latency
+	if (
+		url.pathname.startsWith('/@vite/') ||
+		url.pathname.startsWith('/@fs/') ||
+		url.search.includes('svelte&type=style') ||
+		url.search.includes('svelte&type=script') ||
+		url.hostname === 'localhost' ||
+		url.hostname.startsWith('192.168.') ||
+		url.hostname.startsWith('10.') ||
+		url.hostname.endsWith('.local')
+	) {
+		return;
+	}
+
 	async function respond() {
-		const url = new URL(event.request.url);
 		const cache = await caches.open(CACHE);
 
 		// `build`/`files` can always be served from the cache

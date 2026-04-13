@@ -10,6 +10,23 @@ export default defineConfig({
 		sveltekit(),
 		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' })
 	],
+	server: {
+		// Warm up frequently used files to reduce initial load/navigation time
+		warmup: {
+			clientFiles: [
+				'./src/routes/+layout.svelte',
+				'./src/routes/(app)/+layout.svelte',
+				'./src/routes/(app)/home/+page.svelte',
+				'./src/lib/components/layout/Nav.svelte',
+				'./src/lib/components/layout/Header.svelte',
+				'./src/lib/components/discovery/LocationCard.svelte'
+			]
+		},
+		hmr: {
+			// Disable overlay to reduce mobile browser overhead
+			overlay: false
+		}
+	},
 	test: {
 		expect: { requireAssertions: true },
 		projects: [

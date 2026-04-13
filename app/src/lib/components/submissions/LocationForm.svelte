@@ -40,7 +40,7 @@
 			bind:value={name}
 			required
 			placeholder="e.g., The Cozy Corner"
-			class="bg-surface-container-low focus:ring-peach w-full rounded-[1.5rem] px-6 py-4 text-neutral-800 placeholder-neutral-400 shadow-sm focus:ring-2 focus:outline-none"
+			class="bg-surface-container-low w-full rounded-[1.5rem] px-6 py-4 text-neutral-800 placeholder-neutral-400 shadow-sm focus:ring-2 focus:ring-peach focus:outline-none"
 		/>
 	</div>
 
@@ -54,7 +54,7 @@
 			id="address"
 			bind:value={address}
 			placeholder="Street, City"
-			class="bg-surface-container-low focus:ring-peach w-full rounded-[1.5rem] px-6 py-4 text-neutral-800 placeholder-neutral-400 shadow-sm focus:ring-2 focus:outline-none"
+			class="bg-surface-container-low w-full rounded-[1.5rem] px-6 py-4 text-neutral-800 placeholder-neutral-400 shadow-sm focus:ring-2 focus:ring-peach focus:outline-none"
 		/>
 	</div>
 
@@ -68,14 +68,14 @@
 			id="description"
 			bind:value={description}
 			placeholder="Tell us why it's cool! ✨"
-			class="bg-surface-container-low focus:ring-peach h-32 w-full resize-none rounded-[1.5rem] px-6 py-4 text-neutral-800 placeholder-neutral-400 shadow-sm focus:ring-2 focus:outline-none"
+			class="bg-surface-container-low h-32 w-full resize-none rounded-[1.5rem] px-6 py-4 text-neutral-800 placeholder-neutral-400 shadow-sm focus:ring-2 focus:ring-peach focus:outline-none"
 		></textarea>
 	</div>
 
 	<button
 		type="submit"
 		disabled={submitting}
-		class="shadow-ambient bg-peach w-full rounded-full py-5 text-lg font-black text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+		class="shadow-ambient w-full rounded-full bg-peach py-5 text-lg font-black text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
 	>
 		{submitting ? 'Sending to the curators... 🕊️' : 'Share the Magic! ✨'}
 	</button>

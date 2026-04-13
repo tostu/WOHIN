@@ -67,15 +67,13 @@
 
 <!-- VIBE PILLS — hero affordance -->
 <section class="pt-5 pb-2">
-	<div
-		class="scrollbar-hide flex snap-x gap-3 overflow-x-auto px-5 pb-3"
-	>
+	<div class="scrollbar-hide flex snap-x gap-3 overflow-x-auto px-5 pb-3">
 		{#each data.activities as activity, i (activity.id)}
 			{@const active = selectedActivityId === activity.id}
 			<button
 				type="button"
 				onclick={() => handleActivitySelect(activity.id, activity.name)}
-				class="animate-slide-up flex min-h-[56px] flex-shrink-0 snap-start transform items-center gap-2.5 rounded-full border-2 px-6 py-4 transition-all duration-300 active:scale-95 {active
+				class="animate-slide-up flex min-h-[56px] flex-shrink-0 transform snap-start items-center gap-2.5 rounded-full border-2 px-6 py-4 transition-all duration-300 active:scale-95 {active
 					? `${getActivityColor(activity.themeColor)} scale-[1.03] border-transparent shadow-[0_10px_30px_rgba(0,0,0,0.12)]`
 					: 'border-ink/10 bg-white hover:border-ink/30'}"
 				style="animation-delay: {i * 40}ms;"
@@ -145,6 +143,7 @@
 								src={spot.image || spot.photos![0]}
 								alt={spot.name}
 								class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+								style:view-transition-name="location-image-{spot.slug}"
 							/>
 						{:else}
 							<div class="absolute inset-0 bg-gradient-to-br from-peach to-sunny"></div>
@@ -162,10 +161,13 @@
 								<span
 									class="mb-2 inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-3 py-1.5 text-[10px] font-bold tracking-wider text-white uppercase backdrop-blur-md"
 								>
-									{spot.activities[0].icon} {spot.activities[0].name}
+									{spot.activities[0].icon}
+									{spot.activities[0].name}
 								</span>
 							{/if}
-							<h3 class="mb-1 font-display text-2xl font-black leading-none tracking-tight text-white">
+							<h3
+								class="mb-1 font-display text-2xl leading-none font-black tracking-tight text-white"
+							>
 								{spot.name}
 							</h3>
 							<p class="text-xs font-medium text-white/70">
@@ -189,6 +191,7 @@
 									src={spot.image || spot.photos![0]}
 									alt={spot.name}
 									class="h-full w-full object-cover"
+									style:view-transition-name="location-image-{spot.slug}"
 								/>
 							{:else}
 								<div
@@ -199,9 +202,7 @@
 							{/if}
 						</div>
 						<div class="p-3">
-							<p
-								class="mb-1 truncate font-display text-[14px] font-black leading-tight text-ink"
-							>
+							<p class="mb-1 truncate font-display text-[14px] leading-tight font-black text-ink">
 								{spot.name}
 							</p>
 							<p class="truncate text-[11px] font-medium text-muted">
@@ -228,7 +229,7 @@
 				{#each data.newArrivals as arrival, i (arrival.id)}
 					<a
 						href={localizeHref(`/location/${arrival.slug}`)}
-						class="group flex items-center gap-4 rounded-3xl border border-white bg-white/60 p-3 shadow-[0_4px_20px_rgba(0,0,0,0.04)] backdrop-blur-lg transition-all duration-300 active:scale-[0.98] hover:bg-white hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
+						class="group flex items-center gap-4 rounded-3xl border border-white bg-white/60 p-3 shadow-[0_4px_20px_rgba(0,0,0,0.04)] backdrop-blur-lg transition-all duration-300 hover:bg-white hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] active:scale-[0.98]"
 						in:fly={{ x: -20, delay: i * 80, duration: 400 }}
 					>
 						<div
@@ -239,6 +240,7 @@
 									src={arrival.image || arrival.photos![0]}
 									alt={arrival.name}
 									class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+									style:view-transition-name="location-image-{arrival.slug}"
 								/>
 							{:else}
 								<span class="text-2xl">{arrival.activities[0]?.icon || '📍'}</span>
@@ -249,8 +251,9 @@
 								{arrival.name}
 							</p>
 							<p class="truncate text-[11px] font-medium text-muted">
-								{arrival.activities[0]?.name || ''}{arrival.activities[0] ? ' · ' : ''}{arrival
-									.address?.split(',')[0] || 'Berlin'}
+								{arrival.activities[0]?.name || ''}{arrival.activities[0]
+									? ' · '
+									: ''}{arrival.address?.split(',')[0] || 'Berlin'}
 							</p>
 						</div>
 						<div

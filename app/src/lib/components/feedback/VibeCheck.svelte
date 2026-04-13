@@ -89,7 +89,7 @@
 		</h3>
 		{#if currentVibe}
 			<span
-				class="text-peach animate-pulse rounded-full bg-white/50 px-3 py-1 text-xs font-bold shadow-sm"
+				class="animate-pulse rounded-full bg-white/50 px-3 py-1 text-xs font-bold text-peach shadow-sm"
 				>Vibe sent! 💌</span
 			>
 		{/if}
@@ -101,7 +101,7 @@
 				onclick={() => dropVibe(vibe.id)}
 				class="group bg-surface-container hover:shadow-ambient relative flex h-16 w-16 items-center justify-center rounded-[2rem] text-3xl shadow-sm transition-all duration-300 ease-out hover:-translate-y-2 hover:scale-110 sm:h-20 sm:w-20 sm:text-4xl {vibe.bg} active:scale-95 {currentVibe ===
 				vibe.id
-					? 'ring-offset-surface-container-lowest ring-peach/50 bg-white ring-4 ring-offset-4'
+					? 'ring-offset-surface-container-lowest bg-white ring-4 ring-peach/50 ring-offset-4'
 					: ''}"
 				title={vibe.label}
 				aria-label={`Drop a ${vibe.label} vibe`}

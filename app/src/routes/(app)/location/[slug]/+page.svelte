@@ -56,6 +56,7 @@
 					src={location.image || location.photos![0]}
 					alt={location.name}
 					class="h-full w-full object-cover"
+					style:view-transition-name="location-image-{location.slug}"
 				/>
 			{:else}
 				<div class="bg-surface-container-high flex h-full w-full items-center justify-center">
@@ -77,7 +78,7 @@
 			class="bg-surface-container-low shadow-ambient relative z-10 -mt-12 flex-grow rounded-t-[3rem] px-6 pt-10"
 		>
 			<div class="mb-10 flex flex-wrap gap-2">
-				{#each location.activities as activity}
+				{#each location.activities as activity (activity.id)}
 					<button
 						onclick={() => (selectedActivityId = activity.id)}
 						class="rounded-full px-5 py-2 text-sm font-bold tracking-wide transition-all {selectedActivityId ===
@@ -148,6 +149,6 @@
 	</article>
 {:else}
 	<div class="flex h-screen items-center justify-center">
-		<p class="text-peach animate-pulse font-bold">Loading the magic... ✨</p>
+		<p class="animate-pulse font-bold text-peach">Loading the magic... ✨</p>
 	</div>
 {/if}

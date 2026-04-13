@@ -79,7 +79,7 @@
 			{#each vibes as vibe, i (vibe.name)}
 				<div
 					in:fly={{ y: 50, duration: 800, delay: vibe.delay + 600 }}
-					class="absolute h-48 w-48 {vibe.color} {vibe.rotate} flex cursor-default transform flex-col justify-between rounded-3xl bg-opacity-90 p-6 shadow-2xl backdrop-blur-sm transition-transform duration-500 hover:rotate-0 hover:scale-105 md:h-64 md:w-64"
+					class="absolute h-48 w-48 {vibe.color} {vibe.rotate} bg-opacity-90 flex transform cursor-default flex-col justify-between rounded-3xl p-6 shadow-2xl backdrop-blur-sm transition-transform duration-500 hover:scale-105 hover:rotate-0 md:h-64 md:w-64"
 					style="top: {i * 15}%; left: {i * 20}%; z-index: {10 - i};"
 				>
 					<div class="text-4xl md:text-6xl">{vibe.emoji}</div>
@@ -90,13 +90,8 @@
 	</section>
 
 	<!-- Features -->
-	<section
-		in:fade={{ duration: 1000, delay: 1000 }}
-		class="border-t-2 border-ink/5 py-24"
-	>
-		<h2
-			class="mb-16 text-center font-display text-4xl font-extrabold tracking-tight md:text-5xl"
-		>
+	<section in:fade={{ duration: 1000, delay: 1000 }} class="border-t-2 border-ink/5 py-24">
+		<h2 class="mb-16 text-center font-display text-4xl font-extrabold tracking-tight md:text-5xl">
 			The Radiant Curator
 		</h2>
 

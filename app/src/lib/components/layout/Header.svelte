@@ -23,9 +23,7 @@
 	}
 </script>
 
-<header
-	class="safe-top sticky top-0 z-40 border-b border-ink/5 bg-cream/70 backdrop-blur-xl"
->
+<header class="safe-top sticky top-0 z-40 border-b border-ink/5 bg-cream/70 backdrop-blur-xl">
 	<div class="flex items-center justify-between px-5 py-3">
 		<div
 			class="flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-cream shadow-[0_4px_15px_rgba(0,0,0,0.1)]"
@@ -41,7 +39,7 @@
 					onclick={toggle}
 					aria-label="Search"
 					aria-expanded={open}
-					class="flex h-11 w-11 items-center justify-center rounded-full bg-ink/5 text-ink transition-all active:scale-90 hover:bg-ink/10"
+					class="flex h-11 w-11 items-center justify-center rounded-full bg-ink/5 text-ink transition-all hover:bg-ink/10 active:scale-90"
 				>
 					<Search size={20} strokeWidth={2.5} />
 				</button>
@@ -49,11 +47,10 @@
 			<button
 				type="button"
 				aria-label="Notifications"
-				class="relative flex h-11 w-11 items-center justify-center rounded-full bg-ink/5 text-ink transition-all active:scale-90 hover:bg-ink/10"
+				class="relative flex h-11 w-11 items-center justify-center rounded-full bg-ink/5 text-ink transition-all hover:bg-ink/10 active:scale-90"
 			>
 				<Bell size={20} strokeWidth={2.5} />
-				<span
-					class="absolute top-2 right-2 h-2.5 w-2.5 rounded-full border-2 border-cream bg-peach"
+				<span class="absolute top-2 right-2 h-2.5 w-2.5 rounded-full border-2 border-cream bg-peach"
 				></span>
 			</button>
 		</div>

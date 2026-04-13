@@ -11,7 +11,7 @@
 	<p class="max-w-xs text-neutral-600">{message}</p>
 	<button
 		onclick={() => window.location.reload()}
-		class="shadow-ambient bg-peach mt-8 rounded-full px-8 py-3 font-bold text-white transition-transform hover:scale-105 active:scale-95"
+		class="shadow-ambient mt-8 rounded-full bg-peach px-8 py-3 font-bold text-white transition-transform hover:scale-105 active:scale-95"
 	>
 		Gently wake it up
 	</button>

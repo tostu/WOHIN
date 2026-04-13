@@ -2,7 +2,7 @@
 	import type { LocationSearchResult } from '$lib/server/services/discovery';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import { MapPin, Heart, Share2 } from 'lucide-svelte';
-	import { fade, fly } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 
 	let { location }: { location: LocationSearchResult } = $props();
 
@@ -34,7 +34,7 @@
 	<!-- Main Card Body -->
 	<a
 		href={localizeHref(`/location/${location.slug}`)}
-		class="group card-asymmetric relative block overflow-hidden bg-white shadow-extreme transition-all duration-500 hover:scale-[1.02] hover:-translate-y-2 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] active:scale-[0.98] active:translate-y-0"
+		class="group card-asymmetric relative block overflow-hidden bg-white shadow-extreme transition-all duration-500 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] active:translate-y-0 active:scale-[0.98]"
 	>
 		<div class="flex flex-col gap-6 md:flex-row">
 			<!-- Image Section: Breaking boundaries -->
@@ -46,6 +46,7 @@
 						src={location.image || location.photos![0]}
 						alt={location.name}
 						class="h-full w-full object-cover transition-all duration-700 will-change-transform group-hover:scale-110"
+						style:view-transition-name="location-image-{location.slug}"
 					/>
 				{:else}
 					<div class="flex h-full w-full items-center justify-center bg-secondary/20">
@@ -87,7 +88,7 @@
 				<div class="flex items-center justify-between">
 					<!-- Mini Feedback Stack -->
 					<div class="flex -space-x-2">
-						{#each ['✨', '🍵', '🌿'] as emoji, i}
+						{#each ['✨', '🍵', '🌿'] as emoji, i (emoji)}
 							<div
 								class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-secondary/20 text-sm shadow-sm"
 								style="z-index: {10 - i}"
@@ -129,7 +130,7 @@
 			class="glass absolute right-12 -bottom-4 z-20 flex gap-2 rounded-2xl p-2 shadow-extreme"
 			transition:fly={{ y: 10, duration: 200 }}
 		>
-			{#each emojiOptions as emoji}
+			{#each emojiOptions as emoji (emoji)}
 				<button
 					class="flex h-10 w-10 items-center justify-center text-xl transition-transform hover:scale-150 active:scale-90"
 					onclick={() => handleFeedback(emoji)}

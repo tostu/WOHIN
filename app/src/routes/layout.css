@@ -104,11 +104,7 @@
 	}
 
 	.card-asymmetric {
-		@apply rounded-[2.5rem] p-8 transition-all duration-300;
+		@apply rounded-[2.5rem] p-8;
 		clip-path: polygon(0% 0%, 100% 2%, 98% 100%, 2% 98%);
-	}
-
-	.card-asymmetric:hover {
-		clip-path: polygon(2% 2%, 98% 0%, 100% 98%, 0% 100%);
 	}
 }

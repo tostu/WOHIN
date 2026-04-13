@@ -15,6 +15,7 @@ export interface LocationSearchResult {
 	address?: string;
 	distance?: number;
 	rating?: number;
+	image?: string;
 	photos?: string[];
 	activities: Activity[];
 }
@@ -43,6 +44,7 @@ export class DiscoveryService {
 			name,
 			"slug": slug.current,
 			address,
+			"image": image.asset->url,
 			"photos": photos[].asset->url,
 			"activities": activities[]->{
 				"id": _id,
@@ -70,6 +72,7 @@ export class DiscoveryService {
 			name,
 			"slug": slug.current,
 			address,
+			"image": image.asset->url,
 			"photos": photos[].asset->url,
 			"activities": activities[]->{
 				"id": _id,
@@ -98,6 +101,7 @@ export class DiscoveryService {
 			coordinates,
 			hours,
 			description,
+			"image": image.asset->url,
 			"photos": photos[].asset->url,
 			"activities": activities[]->{
 				"id": _id,

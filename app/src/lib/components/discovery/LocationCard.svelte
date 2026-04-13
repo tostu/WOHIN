@@ -30,22 +30,22 @@
 	}
 </script>
 
-<div class="group animate-fade-up relative mb-8">
+<div class="animate-fade-up relative mb-8">
 	<!-- Main Card Body -->
 	<a
 		href={localizeHref(`/location/${location.slug}`)}
-		class="card-asymmetric relative block overflow-hidden bg-white shadow-extreme transition-transform duration-500 hover:scale-[1.02] active:scale-[0.98]"
+		class="group card-asymmetric relative block overflow-hidden bg-white shadow-extreme transition-all duration-500 hover:scale-[1.02] hover:-translate-y-2 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] active:scale-[0.98] active:translate-y-0"
 	>
 		<div class="flex flex-col gap-6 md:flex-row">
 			<!-- Image Section: Breaking boundaries -->
 			<div
 				class="relative -m-4 aspect-[4/3] overflow-hidden rounded-[2rem] shadow-heavy md:w-48 md:shrink-0"
 			>
-				{#if location.photos && location.photos[0]}
+				{#if location.image || (location.photos && location.photos[0])}
 					<img
-						src={location.photos[0]}
+						src={location.image || location.photos![0]}
 						alt={location.name}
-						class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+						class="h-full w-full object-cover transition-all duration-700 will-change-transform group-hover:scale-110"
 					/>
 				{:else}
 					<div class="flex h-full w-full items-center justify-center bg-secondary/20">

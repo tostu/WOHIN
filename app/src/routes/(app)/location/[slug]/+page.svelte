@@ -51,8 +51,12 @@
 {#if location}
 	<article class="relative flex min-h-screen flex-col bg-surface">
 		<header class="relative h-[50vh] w-full overflow-hidden rounded-b-[3rem]">
-			{#if location.photos && location.photos[0]}
-				<img src={location.photos[0]} alt={location.name} class="h-full w-full object-cover" />
+			{#if location.image || (location.photos && location.photos[0])}
+				<img
+					src={location.image || location.photos![0]}
+					alt={location.name}
+					class="h-full w-full object-cover"
+				/>
 			{:else}
 				<div class="bg-surface-container-high flex h-full w-full items-center justify-center">
 					<span class="text-8xl">🏙️</span>

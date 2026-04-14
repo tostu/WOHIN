@@ -141,7 +141,7 @@ export default function LocationDetailScreen() {
         </View>
         <View style={{ height: 100 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

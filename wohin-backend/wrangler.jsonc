@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "wohin-backend",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-14",
+  "compatibility_flags": ["nodejs_als"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wohin-db",
+      "database_id": "8c45f47a-2483-42e1-a3f2-8958742542a2",
+    },
+  ],
+  "vars": {
+    "ORIGIN": "http://localhost:8787",
+    "SANITY_PROJECT_ID": "1ffjhas2",
+    "SANITY_DATASET": "production",
+  },
+}

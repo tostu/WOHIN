@@ -22,20 +22,29 @@ graph TD
     BUILD --> SHIP[SHIP: Verify & Commit]
     SHIP --> FIX[FIX: Debug & Patch]
     FIX --> REFACTOR[REFACTOR: Evolve]
-```
-
 ## 📂 Project Structure
 
+- `app/`: SvelteKit PWA Frontend.
+- `cms/`: Sanity Studio Content Management.
+- `wohin-app/`: Expo (React Native) Mobile App.
+- `wohin-backend/`: Hono (Cloudflare Workers) Backend.
 - `.specify/`: Governance and orchestration templates.
-- `claude-vibes-main/`: Claude Vibes plugin for extended capabilities.
-- `src/`: Core source code (when initialized).
-- `tests/`: Automated tests.
 
-## 🛠️ Getting Started
+## 🛠️ Development
 
-1.  Initialize with `.specify/memory/constitution.md`.
-2.  Use `/speckit.specify` to define a feature.
-3.  Use `/speckit.plan` to create an implementation plan.
-4.  Follow the **START → BUILD → SHIP** protocol.
+WOHIN is managed as a monorepo using Bun.
 
-**Note**: This project follows strict TDD principles for all feature implementations.
+### Start all parts at once
+```bash
+bun dev
+```
+
+### Individual parts
+```bash
+bun run dev:app      # SvelteKit
+bun run dev:cms      # Sanity
+bun run dev:backend  # Hono/Cloudflare
+bun run dev:mobile   # Expo (Web)
+```
+
+## 🔄 The Workflow

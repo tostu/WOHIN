@@ -2,19 +2,19 @@
   "name": "wohin-monorepo",
   "private": true,
   "workspaces": [
-    "app",
     "wohin-cms",
     "wohin-app",
-    "wohin-backend"
+    "wohin-backend",
+    "wohin-site"
   ],
   "scripts": {
-    "dev": "bun x concurrently -n \"app,wohin-cms,backend,mobile\" -c \"magenta,cyan,yellow,blue\" \"bun run --cwd app dev\" \"bun run --cwd wohin-cms dev\" \"bun run --cwd wohin-backend dev\" \"bun run --cwd wohin-app web\"",
+    "dev": "bun x concurrently -n \"cms,backend,mobile,site\" -c \"cyan,yellow,blue,magenta\" \"bun run --cwd wohin-cms dev\" \"bun run --cwd wohin-backend dev\" \"bun run --cwd wohin-app web\" \"bun run --cwd wohin-site dev\"",
     "dev:go": "bun run --cwd wohin-app start",
-    "dev:full": "bun x concurrently -n \"app,wohin-cms,backend,mobile\" -c \"magenta,cyan,yellow,blue\" \"bun run --cwd app dev\" \"bun run --cwd wohin-cms dev\" \"bun run --cwd wohin-backend dev\" \"bun run --cwd wohin-app start\"",
-    "dev:app": "bun run --cwd app dev",
+    "dev:full": "bun x concurrently -n \"cms,backend,mobile,site\" -c \"cyan,yellow,blue,magenta\" \"bun run --cwd wohin-cms dev\" \"bun run --cwd wohin-backend dev\" \"bun run --cwd wohin-app start\" \"bun run --cwd wohin-site dev\"",
     "dev:cms": "bun run --cwd wohin-cms dev",
     "dev:backend": "bun run --cwd wohin-backend dev",
     "dev:mobile": "bun run --cwd wohin-app web",
+    "dev:site": "bun run --cwd wohin-site dev",
     "install:all": "bun install"
   }
 }

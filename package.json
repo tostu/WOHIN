@@ -3,16 +3,16 @@
   "private": true,
   "workspaces": [
     "app",
-    "cms",
+    "wohin-cms",
     "wohin-app",
     "wohin-backend"
   ],
   "scripts": {
-    "dev": "bun x concurrently -n \"app,cms,backend,mobile\" -c \"magenta,cyan,yellow,blue\" \"bun run --cwd app dev\" \"bun run --cwd cms dev\" \"bun run --cwd wohin-backend dev\" \"bun run --cwd wohin-app web\"",
+    "dev": "bun x concurrently -n \"app,wohin-cms,backend,mobile\" -c \"magenta,cyan,yellow,blue\" \"bun run --cwd app dev\" \"bun run --cwd wohin-cms dev\" \"bun run --cwd wohin-backend dev\" \"bun run --cwd wohin-app web\"",
     "dev:go": "bun run --cwd wohin-app start",
-    "dev:full": "bun x concurrently -n \"app,cms,backend,mobile\" -c \"magenta,cyan,yellow,blue\" \"bun run --cwd app dev\" \"bun run --cwd cms dev\" \"bun run --cwd wohin-backend dev\" \"bun run --cwd wohin-app start\"",
+    "dev:full": "bun x concurrently -n \"app,wohin-cms,backend,mobile\" -c \"magenta,cyan,yellow,blue\" \"bun run --cwd app dev\" \"bun run --cwd wohin-cms dev\" \"bun run --cwd wohin-backend dev\" \"bun run --cwd wohin-app start\"",
     "dev:app": "bun run --cwd app dev",
-    "dev:cms": "bun run --cwd cms dev",
+    "dev:cms": "bun run --cwd wohin-cms dev",
     "dev:backend": "bun run --cwd wohin-backend dev",
     "dev:mobile": "bun run --cwd wohin-app web",
     "install:all": "bun install"

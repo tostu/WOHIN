@@ -27,9 +27,9 @@ export default defineType({
       type: 'string',
       options: {
         list: [
-          { title: 'Primary', value: 'primary' },
-          { title: 'Secondary', value: 'secondary' },
-          { title: 'Accent', value: 'accent' },
+          { title: 'Matcha', value: 'matcha' },
+          { title: 'Peach', value: 'peach' },
+          { title: 'Sunny', value: 'sunny' },
         ],
       },
       validation: (Rule) => Rule.required(),

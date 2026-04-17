@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { api } from '@/lib/api';
 import { VibeCheck } from '@/components/feedback/vibe-check';
 import { Location, Activity } from '@/components/discovery/location-card';
+import { PortableText } from '@/components/portable-text';
+import { Share } from 'react-native';
+import { Share2 } from 'lucide-react-native';
 
 export default function LocationDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -66,12 +70,28 @@ export default function LocationDetailScreen() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: location.name, headerTransparent: true, headerTintColor: '#fff' }} />
+      <Stack.Screen options={{
+        title: location.name,
+        headerTransparent: true,
+        headerTintColor: '#fff',
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={() => Share.share({
+              title: location.name,
+              message: `Check out ${location.name} on WOHIN!${location.address ? ` - ${location.address}` : ''}`,
+              url: `wohinapp://location/${location.slug}`,
+            })}
+            style={{ padding: 8 }}
+          >
+            <Share2 size={22} color="#fff" />
+          </TouchableOpacity>
+        ),
+      }} />
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.hero}>
           {location.image ? (
-            <Image source={{ uri: location.image }} style={styles.heroImage} />
+            <Image source={location.image} style={styles.heroImage} contentFit="cover" />
           ) : (
             <View style={styles.heroPlaceholder}>
               <Text style={{ fontSize: 80 }}>🏙️</Text>
@@ -103,10 +123,11 @@ export default function LocationDetailScreen() {
           </View>
 
           <View style={styles.descriptionContainer}>
-            <Text style={styles.description}>
-              {/* Svelte version has description field */}
-              {(location as any).description || 'No description available yet.'}
-            </Text>
+            {Array.isArray((location as any).description) ? (
+              <PortableText value={(location as any).description} />
+            ) : (
+              <Text style={styles.description}>No description available yet.</Text>
+            )}
           </View>
 
           {selectedActivityId && (
@@ -164,7 +185,6 @@ const styles = StyleSheet.create({
   heroImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
   },
   heroPlaceholder: {
     width: '100%',

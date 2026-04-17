@@ -3,19 +3,67 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Activi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { api } from '@/lib/api';
 import { useRouter } from 'expo-router';
+import { useSession } from '@/lib/auth';
+import { useLocation } from '@/hooks/use-location';
+import { MapPin } from 'lucide-react-native';
 
 export default function SubmitScreen() {
+  const { data: session, isPending } = useSession();
+  const { location: currentUserLocation } = useLocation();
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [description, setDescription] = useState('');
+  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const router = useRouter();
 
+  if (isPending) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#ffb7b2" />
+      </View>
+    );
+  }
+
+  if (!session) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.successContent}>
+          <Text style={styles.successEmoji}>🔒</Text>
+          <Text style={styles.successTitle}>Sign in first</Text>
+          <Text style={styles.successDescription}>
+            You need to be signed in to submit a spot.
+          </Text>
+          <TouchableOpacity style={styles.button} onPress={() => router.push('/login')}>
+            <Text style={styles.buttonText}>Sign In</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const handleSetCurrentLocation = () => {
+    if (currentUserLocation) {
+      setCoordinates({
+        lat: currentUserLocation.latitude,
+        lng: currentUserLocation.longitude
+      });
+      alert("Current location set! ✨");
+    } else {
+      alert("Location not available yet. Please wait a moment.");
+    }
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await api.post('/api/v1/submissions/location', { name, address, description });
+      await api.post('/api/v1/submissions/location', { 
+        name, 
+        address, 
+        description,
+        coordinates // Will be mapped to geopoint in Sanity
+      });
       setSubmitted(true);
     } catch (e) {
       console.error('Failed to submit:', e);
@@ -83,6 +131,15 @@ export default function SubmitScreen() {
               value={address}
               onChangeText={setAddress}
             />
+            <TouchableOpacity 
+              style={[styles.locationButton, coordinates && styles.locationButtonActive]} 
+              onPress={handleSetCurrentLocation}
+            >
+              <MapPin size={16} color={coordinates ? "#fff" : "#ffb7b2"} />
+              <Text style={[styles.locationButtonText, coordinates && styles.locationButtonActiveText]}>
+                {coordinates ? "Location Captured! ✨" : "Use my current location"}
+              </Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.inputGroup}>
@@ -174,6 +231,30 @@ const styles = StyleSheet.create({
   textArea: {
     height: 120,
     textAlignVertical: 'top',
+  },
+  locationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    backgroundColor: '#ffb7b215',
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: '#ffb7b2',
+  },
+  locationButtonActive: {
+    backgroundColor: '#ffb7b2',
+  },
+  locationButtonText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#ffb7b2',
+  },
+  locationButtonActiveText: {
+    color: '#fff',
   },
   button: {
     backgroundColor: '#ffb7b2',

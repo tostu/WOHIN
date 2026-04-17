@@ -1,6 +1,8 @@
 import {getCliClient} from 'sanity/cli'
 
 const client = getCliClient()
+const {projectId, dataset} = client.config()
+console.log(`Using Project: ${projectId}, Dataset: ${dataset}`)
 
 const activities = [
   {
@@ -30,62 +32,102 @@ const activities = [
     icon: '🎉',
     description: 'Vibrant energy and social spots.',
   },
+  {
+    _id: 'activity-culture',
+    _type: 'activity',
+    name: 'Culture',
+    slug: {_type: 'slug', current: 'culture'},
+    themeColor: 'sky',
+    icon: '🎭',
+    description: 'Museums, theaters, and more.',
+  },
+  {
+    _id: 'activity-eat-drink',
+    _type: 'activity',
+    name: 'Eat & Drink',
+    slug: {_type: 'slug', current: 'eat-drink'},
+    themeColor: 'rose',
+    icon: '🍽️',
+    description: 'The best cafes and restaurants.',
+  },
 ]
 
 const locations = [
   {
     _type: 'location',
-    name: 'Sunny Library',
-    slug: {_type: 'slug', current: 'sunny-library'},
-    address: '123 Radiant Blvd',
+    name: 'Elbphilharmonie',
+    slug: {_type: 'slug', current: 'elbphilharmonie'},
+    address: 'Platz der Deutschen Einheit 1, 20457 Hamburg',
+    coordinates: {_type: 'geopoint', lat: 53.5413, lng: 9.9841},
     status: 'approved',
-    activities: [{_type: 'reference', _ref: 'activity-study'}],
+    activities: [
+      {_type: 'reference', _ref: 'activity-relax'},
+      {_type: 'reference', _ref: 'activity-culture'},
+    ],
   },
   {
     _type: 'location',
-    name: 'Golden Lounge',
-    slug: {_type: 'slug', current: 'golden-lounge'},
-    address: '456 Sunset Ave',
+    name: 'Miniatur Wunderland',
+    slug: {_type: 'slug', current: 'miniatur-wunderland'},
+    address: 'Kehrwieder 2/Block D, 20457 Hamburg',
+    coordinates: {_type: 'geopoint', lat: 53.5439, lng: 9.9888},
     status: 'approved',
-    activities: [{_type: 'reference', _ref: 'activity-relax'}],
+    activities: [
+      {_type: 'reference', _ref: 'activity-relax'},
+      {_type: 'reference', _ref: 'activity-culture'},
+    ],
   },
   {
     _type: 'location',
-    name: 'Neon Club',
-    slug: {_type: 'slug', current: 'neon-club'},
-    address: '789 Party St',
-    status: 'approved',
-    activities: [{_type: 'reference', _ref: 'activity-party'}],
-  },
-  {
-    _type: 'location',
-    name: 'Matcha Mornings',
-    slug: {_type: 'slug', current: 'matcha-mornings'},
-    address: '101 Green Way',
-    status: 'approved',
-    activities: [{_type: 'reference', _ref: 'activity-study'}],
-  },
-  {
-    _type: 'location',
-    name: 'Velvet Vibes',
-    slug: {_type: 'slug', current: 'velvet-vibes'},
-    address: '202 Soft Lane',
+    name: 'Planten un Blomen',
+    slug: {_type: 'slug', current: 'planten-un-blomen'},
+    address: 'Marseiller Str., 20355 Hamburg',
+    coordinates: {_type: 'geopoint', lat: 53.5606, lng: 9.9821},
     status: 'approved',
     activities: [{_type: 'reference', _ref: 'activity-relax'}],
   },
   {
     _type: 'location',
-    name: 'Peach Palace',
-    slug: {_type: 'slug', current: 'peach-palace'},
-    address: '303 Summer Rd',
+    name: 'Reeperbahn',
+    slug: {_type: 'slug', current: 'reeperbahn'},
+    address: 'Reeperbahn, 20359 Hamburg',
+    coordinates: {_type: 'geopoint', lat: 53.5497, lng: 9.9606},
     status: 'approved',
-    activities: [{_type: 'reference', _ref: 'activity-party'}],
+    activities: [
+      {_type: 'reference', _ref: 'activity-party'},
+      {_type: 'reference', _ref: 'activity-eat-drink'},
+    ],
   },
   {
     _type: 'location',
-    name: 'Zen Garden',
-    slug: {_type: 'slug', current: 'zen-garden'},
-    address: '404 Calm Creek',
+    name: 'Speicherstadt',
+    slug: {_type: 'slug', current: 'speicherstadt'},
+    address: 'Brook, 20457 Hamburg',
+    coordinates: {_type: 'geopoint', lat: 53.5448, lng: 9.9950},
+    status: 'approved',
+    activities: [
+      {_type: 'reference', _ref: 'activity-relax'},
+      {_type: 'reference', _ref: 'activity-culture'},
+    ],
+  },
+  {
+    _type: 'location',
+    name: 'Sternschanze',
+    slug: {_type: 'slug', current: 'sternschanze'},
+    address: 'Schulterblatt, 20357 Hamburg',
+    coordinates: {_type: 'geopoint', lat: 53.5617, lng: 9.9620},
+    status: 'approved',
+    activities: [
+      {_type: 'reference', _ref: 'activity-party'},
+      {_type: 'reference', _ref: 'activity-eat-drink'},
+    ],
+  },
+  {
+    _type: 'location',
+    name: 'Binnenalster',
+    slug: {_type: 'slug', current: 'binnenalster'},
+    address: 'Jungfernstieg, 20354 Hamburg',
+    coordinates: {_type: 'geopoint', lat: 53.5534, lng: 9.9926},
     status: 'approved',
     activities: [{_type: 'reference', _ref: 'activity-relax'}],
   },
@@ -107,6 +149,23 @@ async function uploadImage() {
 }
 
 async function seed() {
+  console.log(`Checking write permissions for project ${projectId} in dataset ${dataset}...`)
+  try {
+    // Attempt a no-op patch to test write access
+    await client.patch('non-existent-id').set({}).commit()
+  } catch (err: any) {
+    if (err.statusCode === 403 || err.statusCode === 401) {
+      console.error('❌ PERMISSION ERROR: Your Sanity CLI token does not have write access.')
+      console.error('Try running: sanity logout && sanity login')
+      console.error('Or ensure you have a "SANITY_AUTH_TOKEN" environment variable with "Editor" or "Administrator" role.')
+      process.exit(1)
+    }
+    // 404 is actually "success" for a permission check on a non-existent document
+    if (err.statusCode !== 404) {
+      console.warn('⚠️ Connection test returned unexpected error:', err.message)
+    }
+  }
+
   console.log('Seeding activities...')
   for (const activity of activities) {
     await client.createOrReplace(activity)
@@ -134,12 +193,13 @@ async function seed() {
       }
       await client.create(newLocation)
       console.log(`Created location with image: ${location.name}`)
-    } else if (!existing.image) {
-      console.log(`Updating existing location with missing image: ${location.name}`)
-      const asset = await uploadImage()
-      await client
-        .patch(existing._id)
-        .set({
+    } else {
+      console.log(`Updating existing location: ${location.name}`)
+      let patch = client.patch(existing._id).set(location)
+      
+      if (!existing.image) {
+        const asset = await uploadImage()
+        patch = patch.set({
           image: {
             _type: 'image',
             asset: {
@@ -148,10 +208,10 @@ async function seed() {
             },
           },
         })
-        .commit()
+      }
+      
+      await patch.commit()
       console.log(`Updated location: ${location.name}`)
-    } else {
-      console.log(`Location already exists with image: ${location.name}`)
     }
   }
 

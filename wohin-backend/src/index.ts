@@ -4,6 +4,7 @@ import { createAuth } from "./auth";
 import { DiscoveryService } from "./services/discovery";
 import { FeedbackService } from "./services/feedback";
 import { SubmissionsService } from "./services/submissions";
+import { FavoritesService } from "./services/favorites";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
@@ -27,18 +28,20 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => {
 
 // Discovery API
 app.get("/api/v1/discovery/search", async (c) => {
+  const q = c.req.query("q");
   const activityId = c.req.query("activityId");
-  if (!activityId) return c.json({ error: "Missing activityId" }, 400);
-
   const lat = c.req.query("lat");
   const lng = c.req.query("lng");
-  const radius = c.req.query("radius");
+
+  if (!q && !activityId) {
+    return c.json({ error: "Provide q or activityId" }, 400);
+  }
 
   const results = await DiscoveryService.searchLocations(c.env, {
-    activityId,
-    lat: lat ? parseFloat(lat) : undefined,
-    lng: lng ? parseFloat(lng) : undefined,
-    radius: radius ? parseInt(radius) : 5000,
+    q: q || undefined,
+    activityId: activityId || undefined,
+    userLat: lat ? parseFloat(lat) : undefined,
+    userLng: lng ? parseFloat(lng) : undefined,
   });
 
   return c.json({ results });
@@ -53,9 +56,14 @@ app.get("/api/v1/discovery/location/:slug", async (c) => {
 
 app.get("/api/v1/discovery/featured", async (c) => {
   const limit = c.req.query("limit");
+  const lat = c.req.query("lat");
+  const lng = c.req.query("lng");
+
   const results = await DiscoveryService.getFeaturedLocations(
     c.env,
     limit ? parseInt(limit) : 10,
+    lat ? parseFloat(lat) : undefined,
+    lng ? parseFloat(lng) : undefined,
   );
   return c.json({ results });
 });
@@ -100,6 +108,35 @@ app.post("/api/v1/feedback/vibe", async (c) => {
     vibe,
   });
   return c.json(result[0]);
+});
+
+// Favorites API
+app.post("/api/v1/favorites/toggle", async (c) => {
+  const auth = createAuth(c.env);
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session) return c.json({ error: "Unauthorized" }, 401);
+
+  const { locationId } = await c.req.json();
+  if (!locationId) return c.json({ error: "Missing locationId" }, 400);
+
+  const result = await FavoritesService.toggle(
+    c.env.DB,
+    session.user.id,
+    locationId,
+  );
+  return c.json(result);
+});
+
+app.get("/api/v1/favorites", async (c) => {
+  const auth = createAuth(c.env);
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session) return c.json({ error: "Unauthorized" }, 401);
+
+  const favorites = await FavoritesService.getMyFavorites(
+    c.env.DB,
+    session.user.id,
+  );
+  return c.json(favorites);
 });
 
 // Submissions API

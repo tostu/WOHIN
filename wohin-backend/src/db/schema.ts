@@ -10,6 +10,19 @@ export const task = sqliteTable('task', {
 	priority: integer('priority').notNull().default(1)
 });
 
+export const favorite = sqliteTable('favorite', {
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
+	userId: text('user_id')
+		.notNull()
+		.references(() => user.id),
+	locationId: text('location_id').notNull(),
+	createdAt: integer('created_at', { mode: 'timestamp' })
+		.notNull()
+		.default(sql`(unixepoch())`)
+});
+
 export const vibeFeedback = sqliteTable('vibe_feedback', {
 	id: text('id')
 		.primaryKey()

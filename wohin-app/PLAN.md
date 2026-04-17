@@ -163,38 +163,20 @@
 
 ---
 
-## Phase 6: Content & Engagement
+## Phase 6: UX & Engagement
 
-### Task 6.1: Blog/Posts Screen
-**Complexity**: L
-**Description**: CMS has post, author, category schemas but app has zero blog features. Add posts feed.
-**Files to create (backend)**:
-- `wohin-backend/src/services/posts.ts` — Sanity GROQ queries:
-  - `getPosts(limit)` — list with title, slug, excerpt, author, mainImage, publishedAt
-  - `getPostBySlug(slug)` — full post with body (blockContent)
-**Files to modify (backend)**:
-- `wohin-backend/src/index.ts` — add `/api/v1/posts` and `/api/v1/posts/:slug` routes
-**Files to create (app)**:
-- `wohin-app/components/posts/post-card.tsx` — card with image, title, excerpt, author, date
-- `wohin-app/app/post/[slug].tsx` — full post detail using PortableText component
-**Files to modify (app)**:
-- `wohin-app/app/(tabs)/index.tsx` — add "From the Blog" section after "Just Landed", or
-- `wohin-app/app/_layout.tsx` — add post/[slug] to stack
-**Dependencies**: Task 1.3 (portable text renderer — already done)
-
-### Task 6.2: Deep Linking Configuration
+### Task 6.1: Deep Linking Configuration
 **Complexity**: M
 **Description**: App defines `scheme: "wohinapp"` but no linking config exists.
 **Routes to support**:
 - `wohinapp://location/{slug}` → `/location/[slug]`
-- `wohinapp://post/{slug}` → `/post/[slug]`
 - `wohinapp://discover` → `/(tabs)/discover`
 **Files to modify**:
 - `wohin-app/app.json` — add `intentFilters` (Android) and `associatedDomains` (iOS) for universal links
 - `wohin-app/app/_layout.tsx` — expo-router handles file-based deep links automatically, but verify scheme works
 **Dependencies**: None
 
-### Task 6.3: Onboarding/Welcome Flow
+### Task 6.2: Onboarding/Welcome Flow
 **Complexity**: M
 **Description**: New users land on Home with no context. Add 2-3 screen onboarding.
 **Screens**:
@@ -218,4 +200,4 @@
 4. **Discover vibe filtering is client-side** — fetches 40 locations, filters by keyword. Won't scale. Move to backend query eventually.
 5. **Map requires dev client** for interactive map (react-native-maps). Current approach = card list + native maps links. Upgrade path: `expo-dev-client` + `react-native-maps`.
 6. **Favorites table** needs `drizzle-kit push` to create in D1 before favorites work in production.
-7. **CMS has unused schemas**: post, author, category — built in Phase 6 or remove to reduce confusion.
+7. **CMS has unused schemas**: post, author, category — should be removed from `wohin-cms` to reduce complexity as blog features are out of scope.

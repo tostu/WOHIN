@@ -1,12 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { User, LogOut } from "lucide-react-native";
+import { User, LogOut, Plus } from "lucide-react-native";
 import { useSession, signOut } from "@/lib/auth";
 import { Link } from "expo-router";
+import { api } from "@/lib/api";
 
 export default function ProfileScreen() {
   const { data: session, isPending } = useSession();
+  const [vibeCount, setVibeCount] = useState(0);
+  const [spotCount, setSpotCount] = useState(0);
+
+  useEffect(() => {
+    if (!session) return;
+    api
+      .get<any[]>("/api/v1/feedback/me")
+      .then((vibes) => {
+        setVibeCount(vibes.length);
+        const uniqueLocations = new Set(vibes.map((v: any) => v.locationId));
+        setSpotCount(uniqueLocations.size);
+      })
+      .catch(() => {});
+  }, [session]);
 
   if (isPending) {
     return <View style={styles.container} />;
@@ -45,14 +60,23 @@ export default function ProfileScreen() {
         <Text style={styles.sectionTitle}>Stats</Text>
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
-            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statValue}>{vibeCount}</Text>
             <Text style={styles.statLabel}>Vibes</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statValue}>{spotCount}</Text>
             <Text style={styles.statLabel}>Spots</Text>
           </View>
         </View>
+      </View>
+
+      <View style={styles.actionsSection}>
+        <Link href="/submit" asChild>
+          <TouchableOpacity style={styles.submitButton}>
+            <Plus size={20} color="#fff" />
+            <Text style={styles.submitButtonText}>Submit a Spot</Text>
+          </TouchableOpacity>
+        </Link>
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={() => signOut()}>
@@ -161,6 +185,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#8b8a87",
     fontWeight: "700",
+  },
+  actionsSection: {
+    paddingHorizontal: 24,
+  },
+  submitButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: "#a8e6cf",
+    padding: 16,
+    borderRadius: 24,
+  },
+  submitButtonText: {
+    color: "#fff",
+    fontWeight: "900",
+    fontSize: 16,
   },
   logoutButton: {
     flexDirection: "row",

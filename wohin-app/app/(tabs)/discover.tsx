@@ -13,6 +13,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { X } from "lucide-react-native";
 import { api } from "@/lib/api";
 import { LocationCard, Location } from "@/components/discovery/location-card";
+import { useFavorites } from "@/hooks/use-favorites";
+import { shareLocation } from "@/lib/share";
 
 type ThemeColor = "matcha" | "peach" | "sunny";
 
@@ -124,6 +126,7 @@ export default function DiscoverScreen() {
   const [results, setResults] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
   const [featured, setFeatured] = useState<Location[]>([]);
+  const { isFavorited, toggle: toggleFavorite } = useFavorites();
 
   useEffect(() => {
     api
@@ -242,7 +245,7 @@ export default function DiscoverScreen() {
               <ScrollView contentContainerStyle={styles.resultsScroll}>
                 {results.length > 0 ? (
                   results.map((loc) => (
-                    <LocationCard key={loc.id} location={loc} />
+                    <LocationCard key={loc.id} location={loc} isFavorited={isFavorited(loc.id)} onFavorite={toggleFavorite} onShare={shareLocation} />
                   ))
                 ) : (
                   <View style={styles.emptyState}>

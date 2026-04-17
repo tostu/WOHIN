@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { Image } from 'expo-image';
 import { MapPin, Heart, Share2 } from 'lucide-react-native';
 import { Link } from 'expo-router';
 import { Colors } from '@/constants/theme';
@@ -14,16 +15,25 @@ export interface Activity {
   icon?: string;
 }
 
+export interface VibeCounts {
+  sparkle: number;
+  fire: number;
+  chill: number;
+  nope: number;
+}
+
 export interface Location {
   id: string;
   name: string;
   slug: string;
   address?: string;
+  coordinates?: { lat: number; lng: number };
   distance?: number;
   rating?: number;
   image?: string;
   photos?: string[];
   activities: Activity[];
+  vibeCounts?: VibeCounts;
 }
 
 const themeMap: Record<string, string> = {
@@ -32,7 +42,51 @@ const themeMap: Record<string, string> = {
   sunny: '#ffd97d',
 };
 
-export function LocationCard({ location }: { location: Location }) {
+const vibeEmojiMap: Record<string, string> = {
+  sparkle: '✨',
+  fire: '🔥',
+  chill: '🧊',
+  nope: '👎',
+};
+
+function FeedbackStack({ vibeCounts }: { vibeCounts?: VibeCounts }) {
+  if (!vibeCounts) return <View style={styles.feedbackStack} />;
+
+  const total = vibeCounts.sparkle + vibeCounts.fire + vibeCounts.chill + vibeCounts.nope;
+  if (total === 0) return <View style={styles.feedbackStack} />;
+
+  const active = (Object.entries(vibeCounts) as [string, number][])
+    .filter(([, count]) => count > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+
+  return (
+    <View style={styles.feedbackStack}>
+      {active.map(([key], i) => (
+        <View
+          key={key}
+          style={[styles.emojiCircle, { zIndex: 10 - i, marginLeft: i === 0 ? 0 : -8 }]}
+        >
+          <Text style={styles.emojiText}>{vibeEmojiMap[key]}</Text>
+        </View>
+      ))}
+      {total > 3 && (
+        <View style={[styles.countCircle, { marginLeft: -8 }]}>
+          <Text style={styles.countText}>+{total}</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+interface LocationCardProps {
+  location: Location;
+  isFavorited?: boolean;
+  onFavorite?: (locationId: string) => void;
+  onShare?: (location: Location) => void;
+}
+
+export function LocationCard({ location, isFavorited, onFavorite, onShare }: LocationCardProps) {
   const primaryActivity = location.activities[0];
   const themeColor = primaryActivity ? themeMap[primaryActivity.themeColor] || '#ffb7b2' : '#ffb7b2';
 
@@ -43,8 +97,10 @@ export function LocationCard({ location }: { location: Location }) {
           <View style={styles.imageContainer}>
             {location.image || (location.photos && location.photos[0]) ? (
               <Image
-                source={{ uri: location.image || location.photos?.[0] }}
+                source={location.image || location.photos?.[0]}
                 style={styles.image}
+                contentFit="cover"
+                transition={200}
               />
             ) : (
               <View style={[styles.imagePlaceholder, { backgroundColor: themeColor + '40' }]}>
@@ -62,38 +118,35 @@ export function LocationCard({ location }: { location: Location }) {
           <View style={styles.content}>
             <View style={styles.header}>
               <Text style={styles.title} numberOfLines={1}>{location.name}</Text>
-              <View style={styles.ratingBadge}>
-                <Text style={styles.ratingText}>⭐ {location.rating || '4.5'}</Text>
-              </View>
+              {location.rating != null && (
+                <View style={styles.ratingBadge}>
+                  <Text style={styles.ratingText}>⭐ {location.rating.toFixed(1)}</Text>
+                </View>
+              )}
             </View>
 
             <View style={styles.addressContainer}>
               <MapPin size={12} color="#2c2b2960" />
               <Text style={styles.address} numberOfLines={1}>
+                {location.distance != null ? `${location.distance.toFixed(1)}km · ` : ''}
                 {location.address || 'Berlin, Germany'}
               </Text>
             </View>
 
             <View style={styles.footer}>
-              <View style={styles.feedbackStack}>
-                {['✨', '🍵', '🌿'].map((emoji, i) => (
-                  <View
-                    key={i}
-                    style={[styles.emojiCircle, { zIndex: 10 - i, marginLeft: i === 0 ? 0 : -8 }]}
-                  >
-                    <Text style={styles.emojiText}>{emoji}</Text>
-                  </View>
-                ))}
-                <View style={[styles.countCircle, { marginLeft: -8 }]}>
-                  <Text style={styles.countText}>+12</Text>
-                </View>
-              </View>
+              <FeedbackStack vibeCounts={location.vibeCounts} />
 
               <View style={styles.actions}>
-                <TouchableOpacity style={styles.actionButton}>
-                  <Heart size={20} color="#2c2b29" />
+                <TouchableOpacity
+                  style={[styles.actionButton, isFavorited && styles.favoriteActive]}
+                  onPress={(e) => { e.stopPropagation(); onFavorite?.(location.id); }}
+                >
+                  <Heart size={20} color={isFavorited ? '#fff' : '#2c2b29'} fill={isFavorited ? '#fff' : 'none'} />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton}>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={(e) => { e.stopPropagation(); onShare?.(location); }}
+                >
                   <Share2 size={20} color="#2c2b29" />
                 </TouchableOpacity>
               </View>
@@ -131,7 +184,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
   },
   imagePlaceholder: {
     width: '100%',
@@ -245,5 +297,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffb7b230',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  favoriteActive: {
+    backgroundColor: '#ffb7b2',
   },
 });

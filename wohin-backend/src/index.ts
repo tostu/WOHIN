@@ -37,7 +37,7 @@ app.get("/api/v1/discovery/search", async (c) => {
     return c.json({ error: "Provide q or activityId" }, 400);
   }
 
-  const results = await DiscoveryService.searchLocations(c.env, {
+  const results = await DiscoveryService.searchLocations(c.env, c.env.DB, {
     q: q || undefined,
     activityId: activityId || undefined,
     userLat: lat ? parseFloat(lat) : undefined,
@@ -49,7 +49,7 @@ app.get("/api/v1/discovery/search", async (c) => {
 
 app.get("/api/v1/discovery/location/:slug", async (c) => {
   const slug = c.req.param("slug");
-  const location = await DiscoveryService.getLocationBySlug(c.env, slug);
+  const location = await DiscoveryService.getLocationBySlug(c.env, c.env.DB, slug);
   if (!location) return c.json({ error: "Location not found" }, 404);
   return c.json(location);
 });
@@ -61,6 +61,7 @@ app.get("/api/v1/discovery/featured", async (c) => {
 
   const results = await DiscoveryService.getFeaturedLocations(
     c.env,
+    c.env.DB,
     limit ? parseInt(limit) : 10,
     lat ? parseFloat(lat) : undefined,
     lng ? parseFloat(lng) : undefined,

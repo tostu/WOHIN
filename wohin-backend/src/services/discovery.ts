@@ -1,4 +1,5 @@
 import { getSanityClient } from "./sanity";
+import { FeedbackService } from "./feedback";
 
 export interface Activity {
   id: string;
@@ -13,12 +14,14 @@ export interface LocationSearchResult {
   name: string;
   slug: string;
   address?: string;
+  hours?: string;
   coordinates?: { lat: number; lng: number };
   distance?: number;
   rating?: number;
   image?: string;
   photos?: string[];
   activities: Activity[];
+  vibeCounts?: Record<string, number>;
 }
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -49,6 +52,7 @@ export class DiscoveryService {
 
   static async searchLocations(
     env: CloudflareBindings,
+    db: any,
     params: {
       q?: string;
       activityId?: string;
@@ -77,6 +81,7 @@ export class DiscoveryService {
 			name,
 			"slug": slug.current,
 			address,
+			hours,
 			coordinates,
 			"image": image.asset->url + "?w=800&q=80&auto=format",
 			"photos": photos[].asset->url + "?w=800&q=80&auto=format",
@@ -90,6 +95,21 @@ export class DiscoveryService {
 		}`;
 
     let locations: LocationSearchResult[] = await client.fetch(query, queryParams);
+
+    // Enrich with Vibe Feedback
+    try {
+      if (locations.length > 0) {
+        const summaries = await FeedbackService.getVibeSummaryForLocations(db, locations.map(l => l.id));
+        locations = locations.map(loc => ({
+          ...loc,
+          rating: summaries[loc.id]?.rating || 0,
+          vibeCounts: summaries[loc.id]?.counts
+        }));
+      }
+    } catch (e) {
+      console.error("Enrichment failed:", e);
+      // Continue without enrichment
+    }
 
     if (userLat != null && userLng != null) {
       locations = locations.map(loc => {
@@ -106,6 +126,7 @@ export class DiscoveryService {
 
   static async getFeaturedLocations(
     env: CloudflareBindings,
+    db: any,
     limit: number = 10,
     userLat?: number,
     userLng?: number,
@@ -116,6 +137,7 @@ export class DiscoveryService {
 			name,
 			"slug": slug.current,
 			address,
+			hours,
 			coordinates,
 			"image": image.asset->url + "?w=800&q=80&auto=format",
 			"photos": photos[].asset->url + "?w=800&q=80&auto=format",
@@ -130,6 +152,20 @@ export class DiscoveryService {
 
     let locations: LocationSearchResult[] = await client.fetch(query, { limit });
 
+    // Enrich with Vibe Feedback
+    try {
+      if (locations.length > 0) {
+        const summaries = await FeedbackService.getVibeSummaryForLocations(db, locations.map(l => l.id));
+        locations = locations.map(loc => ({
+          ...loc,
+          rating: summaries[loc.id]?.rating || 0,
+          vibeCounts: summaries[loc.id]?.counts
+        }));
+      }
+    } catch (e) {
+      console.error("Enrichment failed:", e);
+    }
+
     if (userLat != null && userLng != null) {
         locations = locations.map(loc => {
             if (loc.coordinates) {
@@ -143,13 +179,14 @@ export class DiscoveryService {
     return locations;
   }
 
-  static async getLocationBySlug(env: CloudflareBindings, slug: string) {
+  static async getLocationBySlug(env: CloudflareBindings, db: any, slug: string) {
     const client = getSanityClient(env);
     const query = `*[_type == "location" && slug.current == $slug][0]{
 			"id": _id,
 			name,
 			"slug": slug.current,
 			address,
+			hours,
 			coordinates,
 			description,
 			"image": image.asset->url + "?w=1200&q=85&auto=format",
@@ -163,6 +200,18 @@ export class DiscoveryService {
 			}
 		}`;
 
-    return client.fetch(query, { slug });
+    const location = await client.fetch(query, { slug });
+    
+    if (location) {
+      try {
+        const summaries = await FeedbackService.getVibeSummaryForLocations(db, [location.id]);
+        location.rating = summaries[location.id]?.rating || 0;
+        location.vibeCounts = summaries[location.id]?.counts;
+      } catch (e) {
+        console.error("Enrichment failed for slug:", slug, e);
+      }
+    }
+
+    return location;
   }
 }

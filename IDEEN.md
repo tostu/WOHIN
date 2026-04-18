@@ -1,0 +1,4 @@
+- shared locations between site and app
+  - top x lists on site to gain visitor
+  - site visitors should be led to app
+-

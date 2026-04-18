@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { useSession } from '@/lib/auth';
 import { useLocation } from '@/hooks/use-location';
 import { MapPin } from 'lucide-react-native';
+import { useAppTheme } from '@/hooks/use-app-theme';
 
 export default function SubmitScreen() {
   const { data: session, isPending } = useSession();
@@ -17,25 +18,26 @@ export default function SubmitScreen() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const router = useRouter();
+  const theme = useAppTheme();
 
   if (isPending) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#ffb7b2" />
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.accent.peach} />
       </View>
     );
   }
 
   if (!session) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
         <View style={styles.successContent}>
           <Text style={styles.successEmoji}>🔒</Text>
-          <Text style={styles.successTitle}>Sign in first</Text>
-          <Text style={styles.successDescription}>
+          <Text style={[styles.successTitle, { color: theme.ink }]}>Sign in first</Text>
+          <Text style={[styles.successDescription, { color: theme.muted }]}>
             You need to be signed in to submit a spot.
           </Text>
-          <TouchableOpacity style={styles.button} onPress={() => router.push('/login')}>
+          <TouchableOpacity style={[styles.button, { backgroundColor: theme.accent.peach }]} onPress={() => router.push('/login')}>
             <Text style={styles.buttonText}>Sign In</Text>
           </TouchableOpacity>
         </View>
@@ -75,15 +77,15 @@ export default function SubmitScreen() {
 
   if (submitted) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
         <View style={styles.successContent}>
           <Text style={styles.successEmoji}>🕊️</Text>
-          <Text style={styles.successTitle}>Sent to the curators!</Text>
-          <Text style={styles.successDescription}>
+          <Text style={[styles.successTitle, { color: theme.ink }]}>Sent to the curators!</Text>
+          <Text style={[styles.successDescription, { color: theme.muted }]}>
             We'll review your spot and add it to the radiant map soon. Thanks for being awesome! ✨
           </Text>
           <TouchableOpacity
-            style={styles.button}
+            style={[styles.button, { backgroundColor: theme.accent.peach }]}
             onPress={() => {
               setSubmitted(false);
               setName('');
@@ -99,54 +101,65 @@ export default function SubmitScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.title}>
+          <Text style={[styles.title, { color: theme.ink }]}>
             Share a {'\n'}
-            <Text style={styles.italic}>new</Text> {'\n'}
+            <Text style={[styles.italic, { color: theme.accent.matcha }]}>new</Text> {'\n'}
             discovery.
           </Text>
-          <Text style={styles.subTitle}>
+          <Text style={[styles.subTitle, { color: theme.muted }]}>
             Help the community grow by adding your favorite radiant spots.
           </Text>
         </View>
 
-        <View style={styles.form}>
+        <View style={[styles.form, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>SPOT NAME</Text>
+            <Text style={[styles.label, { color: theme.muted }]}>SPOT NAME</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.background, color: theme.ink }]}
               placeholder="e.g., The Cozy Corner"
+              placeholderTextColor={theme.muted}
               value={name}
               onChangeText={setName}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>WHERE IS IT?</Text>
+            <Text style={[styles.label, { color: theme.muted }]}>WHERE IS IT?</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: theme.background, color: theme.ink }]}
               placeholder="Street, City"
+              placeholderTextColor={theme.muted}
               value={address}
               onChangeText={setAddress}
             />
             <TouchableOpacity 
-              style={[styles.locationButton, coordinates && styles.locationButtonActive]} 
+              style={[
+                styles.locationButton, 
+                { borderColor: theme.accent.peach },
+                coordinates ? { backgroundColor: theme.accent.peach } : { backgroundColor: theme.accent.peach + '15' }
+              ]} 
               onPress={handleSetCurrentLocation}
             >
-              <MapPin size={16} color={coordinates ? "#fff" : "#ffb7b2"} />
-              <Text style={[styles.locationButtonText, coordinates && styles.locationButtonActiveText]}>
+              <MapPin size={16} color={coordinates ? "#fff" : theme.accent.peach} />
+              <Text style={[
+                styles.locationButtonText, 
+                { color: theme.accent.peach },
+                coordinates && { color: "#fff" }
+              ]}>
                 {coordinates ? "Location Captured! ✨" : "Use my current location"}
               </Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>THE VIBE</Text>
+            <Text style={[styles.label, { color: theme.muted }]}>THE VIBE</Text>
             <TextInput
-              style={[styles.input, styles.textArea]}
+              style={[styles.input, styles.textArea, { backgroundColor: theme.background, color: theme.ink }]}
               placeholder="Tell us why it's cool! ✨"
+              placeholderTextColor={theme.muted}
               value={description}
               onChangeText={setDescription}
               multiline
@@ -155,7 +168,7 @@ export default function SubmitScreen() {
           </View>
 
           <TouchableOpacity
-            style={styles.button}
+            style={[styles.button, { backgroundColor: theme.accent.peach }]}
             onPress={handleSubmit}
             disabled={loading || !name}
           >
@@ -174,7 +187,6 @@ export default function SubmitScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fefcf4',
   },
   scrollContent: {
     padding: 24,
@@ -186,26 +198,21 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 48,
     fontWeight: '900',
-    color: '#2c2b29',
     lineHeight: 48,
     letterSpacing: -2,
   },
   italic: {
     fontStyle: 'italic',
-    color: '#a8e6cf',
   },
   subTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#8b8a87',
     marginTop: 16,
     lineHeight: 24,
   },
   form: {
-    backgroundColor: '#fff',
     borderRadius: 40,
     padding: 24,
-    shadowColor: '#2c2b29',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
@@ -217,16 +224,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 10,
     fontWeight: '900',
-    color: '#8b8a87',
     letterSpacing: 2,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#fefcf4',
     borderRadius: 20,
     padding: 16,
     fontSize: 16,
-    color: '#2c2b29',
   },
   textArea: {
     height: 120,
@@ -240,24 +244,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 16,
-    backgroundColor: '#ffb7b215',
     alignSelf: 'flex-start',
     borderWidth: 1,
-    borderColor: '#ffb7b2',
-  },
-  locationButtonActive: {
-    backgroundColor: '#ffb7b2',
   },
   locationButtonText: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#ffb7b2',
-  },
-  locationButtonActiveText: {
-    color: '#fff',
   },
   button: {
-    backgroundColor: '#ffb7b2',
     padding: 20,
     borderRadius: 30,
     alignItems: 'center',
@@ -281,13 +275,11 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: 32,
     fontWeight: '900',
-    color: '#2c2b29',
     textAlign: 'center',
     marginBottom: 12,
   },
   successDescription: {
     fontSize: 16,
-    color: '#8b8a87',
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 40,

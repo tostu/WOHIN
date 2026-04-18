@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Image,
   Modal,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { X } from "lucide-react-native";
 import { api } from "@/lib/api";
 import { LocationCard, Location } from "@/components/discovery/location-card";
+import { LocationCardSkeleton } from "@/components/discovery/location-card-skeleton";
 import { useFavorites } from "@/hooks/use-favorites";
 import { shareLocation } from "@/lib/share";
+import { useAppTheme } from "@/hooks/use-app-theme";
 
 type ThemeColor = "matcha" | "peach" | "sunny";
 
@@ -125,15 +127,32 @@ export default function DiscoverScreen() {
   const [activeVibe, setActiveVibe] = useState<Vibe | null>(null);
   const [results, setResults] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [featured, setFeatured] = useState<Location[]>([]);
   const { isFavorited, toggle: toggleFavorite } = useFavorites();
+  const theme = useAppTheme();
+
+  const loadData = useCallback(async (isRefresh = false) => {
+    if (!isRefresh) setLoading(true);
+    try {
+      const res = await api.get<{ results: Location[] }>("/api/v1/discovery/featured?limit=40");
+      setFeatured(res.results);
+    } catch (e) {
+      console.error("Failed to load featured spots:", e);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
 
   useEffect(() => {
-    api
-      .get<{ results: Location[] }>("/api/v1/discovery/featured?limit=40")
-      .then((res) => setFeatured(res.results))
-      .catch(console.error);
-  }, []);
+    loadData();
+  }, [loadData]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    loadData(true);
+  }, [loadData]);
 
   const openVibe = (vibe: Vibe) => {
     setActiveVibe(vibe);
@@ -152,16 +171,25 @@ export default function DiscoverScreen() {
     setResults(matches);
     setLoading(false);
   };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+return (
+  <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+    <ScrollView 
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl 
+          refreshing={refreshing} 
+          onRefresh={onRefresh} 
+          tintColor={theme.accent.peach}
+          colors={[theme.accent.peach]}
+        />
+      }
+    >
         <View style={styles.header}>
-          <Text style={styles.subTitle}>BERLIN · PICK YOUR MOOD</Text>
-          <Text style={styles.title}>
+          <Text style={[styles.subTitle, { color: theme.muted }]}>BERLIN · PICK YOUR MOOD</Text>
+          <Text style={[styles.title, { color: theme.ink }]}>
             What's the <Text style={styles.italic}>vibe</Text>?
           </Text>
-          <Text style={styles.description}>
+          <Text style={[styles.description, { color: theme.muted }]}>
             One tap. We'll handle the rest.
           </Text>
         </View>
@@ -192,7 +220,7 @@ export default function DiscoverScreen() {
                     style={[
                       styles.tileTagline,
                       {
-                        color: vibe.ink === "light" ? "#fefcf480" : "#2c2b2980",
+                        color: vibe.ink === "light" ? "rgba(254, 252, 244, 0.5)" : "rgba(44, 43, 41, 0.5)",
                       },
                     ]}
                   >
@@ -212,35 +240,35 @@ export default function DiscoverScreen() {
         transparent={true}
         onRequestClose={() => setActiveVibe(null)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalIndicator} />
+        <View style={[styles.modalOverlay, { backgroundColor: theme.overlay }]}>
+          <View style={[styles.modalContent, { backgroundColor: theme.background }]}>
+            <View style={[styles.modalIndicator, { backgroundColor: theme.border }]} />
 
             <View style={styles.modalHeader}>
               <View>
-                <Text style={styles.modalSubTitle}>
+                <Text style={[styles.modalSubTitle, { color: theme.muted }]}>
                   VIBE · {results.length} spot{results.length === 1 ? "" : "s"}
                 </Text>
-                <Text style={styles.modalTitle}>
+                <Text style={[styles.modalTitle, { color: theme.ink }]}>
                   <Text style={{ fontSize: 24 }}>{activeVibe?.emoji}</Text>{" "}
                   {activeVibe?.name}
                 </Text>
-                <Text style={styles.modalTagline}>{activeVibe?.tagline}</Text>
+                <Text style={[styles.modalTagline, { color: theme.muted }]}>{activeVibe?.tagline}</Text>
               </View>
               <TouchableOpacity
-                style={styles.closeButton}
+                style={[styles.closeButton, { backgroundColor: theme.ink }]}
                 onPress={() => setActiveVibe(null)}
               >
-                <X size={24} color="#fefcf4" />
+                <X size={24} color={theme.background} />
               </TouchableOpacity>
             </View>
 
             {loading ? (
-              <ActivityIndicator
-                size="large"
-                color="#ffb7b2"
-                style={{ marginTop: 40 }}
-              />
+              <ScrollView contentContainerStyle={styles.resultsScroll}>
+                <LocationCardSkeleton />
+                <LocationCardSkeleton />
+                <LocationCardSkeleton />
+              </ScrollView>
             ) : (
               <ScrollView contentContainerStyle={styles.resultsScroll}>
                 {results.length > 0 ? (
@@ -249,7 +277,7 @@ export default function DiscoverScreen() {
                   ))
                 ) : (
                   <View style={styles.emptyState}>
-                    <Text style={styles.emptyText}>
+                    <Text style={[styles.emptyText, { color: theme.muted }]}>
                       No spots found for this vibe yet! ✨
                     </Text>
                   </View>
@@ -267,7 +295,6 @@ export default function DiscoverScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fefcf4",
   },
   header: {
     padding: 20,
@@ -275,14 +302,12 @@ const styles = StyleSheet.create({
   subTitle: {
     fontSize: 10,
     fontWeight: "900",
-    color: "#8b8a87",
     letterSpacing: 2,
     marginBottom: 4,
   },
   title: {
     fontSize: 36,
     fontWeight: "900",
-    color: "#2c2b29",
     letterSpacing: -1,
   },
   italic: {
@@ -290,7 +315,6 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    color: "#8b8a87",
     fontWeight: "600",
     marginTop: 4,
   },
@@ -319,7 +343,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#ffffff40",
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -337,11 +361,9 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(44, 43, 41, 0.5)",
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: "#fefcf4",
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
     height: "88%",
@@ -350,7 +372,6 @@ const styles = StyleSheet.create({
   modalIndicator: {
     width: 40,
     height: 6,
-    backgroundColor: "#2c2b2920",
     borderRadius: 3,
     alignSelf: "center",
     marginBottom: 20,
@@ -364,26 +385,22 @@ const styles = StyleSheet.create({
   modalSubTitle: {
     fontSize: 10,
     fontWeight: "900",
-    color: "#8b8a87",
     letterSpacing: 2,
     marginBottom: 4,
   },
   modalTitle: {
     fontSize: 32,
     fontWeight: "900",
-    color: "#2c2b29",
     letterSpacing: -1,
   },
   modalTagline: {
     fontSize: 12,
-    color: "#8b8a87",
     fontWeight: "600",
   },
   closeButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#2c2b29",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -396,7 +413,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: "#8b8a87",
     fontWeight: "600",
     textAlign: "center",
   },

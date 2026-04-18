@@ -5,11 +5,13 @@ import { User, LogOut, Plus } from "lucide-react-native";
 import { useSession, signOut } from "@/lib/auth";
 import { Link } from "expo-router";
 import { api } from "@/lib/api";
+import { useAppTheme } from "@/hooks/use-app-theme";
 
 export default function ProfileScreen() {
   const { data: session, isPending } = useSession();
   const [vibeCount, setVibeCount] = useState(0);
   const [spotCount, setSpotCount] = useState(0);
+  const theme = useAppTheme();
 
   useEffect(() => {
     if (!session) return;
@@ -24,20 +26,20 @@ export default function ProfileScreen() {
   }, [session]);
 
   if (isPending) {
-    return <View style={styles.container} />;
+    return <View style={[styles.container, { backgroundColor: theme.background }]} />;
   }
 
   if (!session) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
         <View style={styles.content}>
-          <User size={64} color="#ffb7b2" />
-          <Text style={styles.title}>Join the Community</Text>
-          <Text style={styles.description}>
+          <User size={64} color={theme.accent.peach} />
+          <Text style={[styles.title, { color: theme.ink }]}>Join the Community</Text>
+          <Text style={[styles.description, { color: theme.muted }]}>
             Sign in to drop vibes and share your favorite spots!
           </Text>
           <Link href="/login" asChild>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={[styles.button, { backgroundColor: theme.accent.peach }]}>
               <Text style={styles.buttonText}>Sign In</Text>
             </TouchableOpacity>
           </Link>
@@ -47,41 +49,41 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <View style={styles.avatar}>
+        <View style={[styles.avatar, { backgroundColor: theme.accent.peach }]}>
           <Text style={styles.avatarText}>{session.user.name?.[0] || "U"}</Text>
         </View>
-        <Text style={styles.userName}>{session.user.name}</Text>
-        <Text style={styles.userEmail}>{session.user.email}</Text>
+        <Text style={[styles.userName, { color: theme.ink }]}>{session.user.name}</Text>
+        <Text style={[styles.userEmail, { color: theme.muted }]}>{session.user.email}</Text>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Stats</Text>
+        <Text style={[styles.sectionTitle, { color: theme.ink }]}>Stats</Text>
         <View style={styles.statsRow}>
-          <View style={styles.statBox}>
-            <Text style={styles.statValue}>{vibeCount}</Text>
-            <Text style={styles.statLabel}>Vibes</Text>
+          <View style={[styles.statBox, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
+            <Text style={[styles.statValue, { color: theme.ink }]}>{vibeCount}</Text>
+            <Text style={[styles.statLabel, { color: theme.muted }]}>Vibes</Text>
           </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statValue}>{spotCount}</Text>
-            <Text style={styles.statLabel}>Spots</Text>
+          <View style={[styles.statBox, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
+            <Text style={[styles.statValue, { color: theme.ink }]}>{spotCount}</Text>
+            <Text style={[styles.statLabel, { color: theme.muted }]}>Spots</Text>
           </View>
         </View>
       </View>
 
       <View style={styles.actionsSection}>
         <Link href="/submit" asChild>
-          <TouchableOpacity style={styles.submitButton}>
-            <Plus size={20} color="#fff" />
-            <Text style={styles.submitButtonText}>Submit a Spot</Text>
+          <TouchableOpacity style={[styles.submitButton, { backgroundColor: theme.accent.matcha }]}>
+            <Plus size={20} color={theme.ink} />
+            <Text style={[styles.submitButtonText, { color: theme.ink }]}>Submit a Spot</Text>
           </TouchableOpacity>
         </Link>
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={() => signOut()}>
-        <LogOut size={20} color="#ffb7b2" />
-        <Text style={styles.logoutText}>Sign Out</Text>
+        <LogOut size={20} color={theme.accent.peach} />
+        <Text style={[styles.logoutText, { color: theme.accent.peach }]}>Sign Out</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -90,7 +92,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fefcf4",
   },
   content: {
     flex: 1,
@@ -101,19 +102,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "900",
-    color: "#2c2b29",
     marginTop: 24,
     marginBottom: 8,
   },
   description: {
     fontSize: 16,
-    color: "#8b8a87",
     fontWeight: "600",
     textAlign: "center",
     marginBottom: 32,
   },
   button: {
-    backgroundColor: "#ffb7b2",
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 24,
@@ -131,7 +129,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: "#ffb7b2",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
@@ -144,11 +141,9 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 24,
     fontWeight: "900",
-    color: "#2c2b29",
   },
   userEmail: {
     fontSize: 14,
-    color: "#8b8a87",
     fontWeight: "600",
   },
   section: {
@@ -157,7 +152,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "900",
-    color: "#2c2b29",
     marginBottom: 16,
   },
   statsRow: {
@@ -166,11 +160,9 @@ const styles = StyleSheet.create({
   },
   statBox: {
     flex: 1,
-    backgroundColor: "#fff",
     borderRadius: 24,
     padding: 20,
     alignItems: "center",
-    shadowColor: "#2c2b29",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 10,
@@ -179,11 +171,9 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: "900",
-    color: "#2c2b29",
   },
   statLabel: {
     fontSize: 12,
-    color: "#8b8a87",
     fontWeight: "700",
   },
   actionsSection: {
@@ -194,12 +184,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: "#a8e6cf",
     padding: 16,
     borderRadius: 24,
   },
   submitButtonText: {
-    color: "#fff",
     fontWeight: "900",
     fontSize: 16,
   },
@@ -212,7 +200,6 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   logoutText: {
-    color: "#ffb7b2",
     fontWeight: "900",
     fontSize: 16,
   },

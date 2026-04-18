@@ -4,10 +4,12 @@ import { Image } from 'expo-image';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { api } from '@/lib/api';
 import { VibeCheck } from '@/components/feedback/vibe-check';
-import { Location, Activity } from '@/components/discovery/location-card';
+import { Location } from '@/components/discovery/location-card';
 import { PortableText } from '@/components/portable-text';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Share } from 'react-native';
 import { Share2 } from 'lucide-react-native';
+import { useAppTheme } from '@/hooks/use-app-theme';
 
 export default function LocationDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -15,6 +17,7 @@ export default function LocationDetailScreen() {
   const [vibeHistory, setVibeHistory] = useState<any[]>([]);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const theme = useAppTheme();
 
   useEffect(() => {
     async function loadData() {
@@ -54,22 +57,33 @@ export default function LocationDetailScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#ffb7b2" />
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <Skeleton width="100%" height={400} borderRadius={0} />
+          <View style={[styles.content, { marginTop: -30 }]}>
+            <View style={{ flexDirection: 'row', gap: 8, marginBottom: 32 }}>
+              <Skeleton width={100} height={40} borderRadius={20} />
+              <Skeleton width={100} height={40} borderRadius={20} />
+            </View>
+            <Skeleton width="100%" height={20} style={{ marginBottom: 12 }} />
+            <Skeleton width="90%" height={20} style={{ marginBottom: 12 }} />
+            <Skeleton width="100%" height={150} borderRadius={32} style={{ marginTop: 20 }} />
+          </View>
+        </ScrollView>
       </View>
     );
   }
 
   if (!location) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text>Location not found</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+        <Text style={{ color: theme.ink }}>Location not found</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Stack.Screen options={{
         title: location.name,
         headerTransparent: true,
@@ -93,18 +107,18 @@ export default function LocationDetailScreen() {
           {location.image ? (
             <Image source={location.image} style={styles.heroImage} contentFit="cover" />
           ) : (
-            <View style={styles.heroPlaceholder}>
+            <View style={[styles.heroPlaceholder, { backgroundColor: theme.accent.peach + '20' }]}>
               <Text style={{ fontSize: 80 }}>🏙️</Text>
             </View>
           )}
-          <View style={styles.heroOverlay} />
+          <View style={[styles.heroOverlay, { backgroundColor: theme.overlay }]} />
           <View style={styles.heroContent}>
             <Text style={styles.name}>{location.name}</Text>
             <Text style={styles.address}>{location.address || 'Address coming soon'}</Text>
           </View>
         </View>
 
-        <View style={styles.content}>
+        <View style={[styles.content, { backgroundColor: theme.background }]}>
           <View style={styles.activitiesScroll}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
               {location.activities.map((activity) => (
@@ -113,10 +127,12 @@ export default function LocationDetailScreen() {
                   onPress={() => setSelectedActivityId(activity.id)}
                   style={[
                     styles.activityButton,
-                    selectedActivityId === activity.id ? styles.activeActivity : styles.inactiveActivity
+                    selectedActivityId === activity.id 
+                      ? { backgroundColor: theme.accent.peach } 
+                      : { backgroundColor: theme.border }
                   ]}
                 >
-                  <Text>{activity.icon} {activity.name}</Text>
+                  <Text style={{ color: theme.ink }}>{activity.icon} {activity.name}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -126,12 +142,12 @@ export default function LocationDetailScreen() {
             {Array.isArray((location as any).description) ? (
               <PortableText value={(location as any).description} />
             ) : (
-              <Text style={styles.description}>No description available yet.</Text>
+              <Text style={[styles.description, { color: theme.ink }]}>No description available yet.</Text>
             )}
           </View>
 
           {selectedActivityId && (
-            <View style={styles.vibeCheckCard}>
+            <View style={[styles.vibeCheckCard, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
               <VibeCheck
                 locationId={location.id}
                 activityId={selectedActivityId}
@@ -140,19 +156,19 @@ export default function LocationDetailScreen() {
             </View>
           )}
 
-          <View style={styles.historyCard}>
-            <Text style={styles.historyTitle}>✨ Vibe History</Text>
+          <View style={[styles.historyCard, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
+            <Text style={[styles.historyTitle, { color: theme.ink }]}>✨ Vibe History</Text>
             {vibeHistory.length === 0 ? (
-              <Text style={styles.emptyHistory}>No vibe checks yet. Be the first to drop one! 💖</Text>
+              <Text style={[styles.emptyHistory, { color: theme.muted }]}>No vibe checks yet. Be the first to drop one! 💖</Text>
             ) : (
               <View style={styles.statsGrid}>
                 {Object.entries(vibeCounts).map(([key, count]) => (
                   count as number > 0 ? (
-                    <View key={key} style={styles.statBox}>
+                    <View key={key} style={[styles.statBox, { backgroundColor: theme.background }]}>
                       <Text style={styles.statEmoji}>
                         {key === 'sparkle' ? '✨' : key === 'fire' ? '🔥' : key === 'chill' ? '🧊' : '👎'}
                       </Text>
-                      <Text style={styles.statCount}>{count as number}</Text>
+                      <Text style={[styles.statCount, { color: theme.ink }]}>{count as number}</Text>
                     </View>
                   ) : null
                 ))}
@@ -169,13 +185,11 @@ export default function LocationDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fefcf4',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fefcf4',
   },
   hero: {
     height: 400,
@@ -189,13 +203,11 @@ const styles = StyleSheet.create({
   heroPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#ffb7b220',
     alignItems: 'center',
     justifyContent: 'center',
   },
   heroOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.3)',
   },
   heroContent: {
     position: 'absolute',
@@ -216,7 +228,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   content: {
-    backgroundColor: '#fefcf4',
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
     marginTop: -30,
@@ -230,13 +241,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
-    fontWeight: '700',
-  },
-  activeActivity: {
-    backgroundColor: '#ffb7b2',
-  },
-  inactiveActivity: {
-    backgroundColor: '#2c2b2910',
   },
   descriptionContainer: {
     marginBottom: 32,
@@ -244,25 +248,20 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     lineHeight: 24,
-    color: '#2c2b29',
     opacity: 0.8,
   },
   vibeCheckCard: {
-    backgroundColor: '#fff',
     borderRadius: 32,
     padding: 8,
     marginBottom: 32,
-    shadowColor: '#2c2b29',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
     elevation: 2,
   },
   historyCard: {
-    backgroundColor: '#fff',
     borderRadius: 32,
     padding: 24,
-    shadowColor: '#2c2b29',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
@@ -271,12 +270,10 @@ const styles = StyleSheet.create({
   historyTitle: {
     fontSize: 20,
     fontWeight: '900',
-    color: '#2c2b29',
     marginBottom: 20,
   },
   emptyHistory: {
     fontSize: 14,
-    color: '#8b8a87',
     fontStyle: 'italic',
   },
   statsGrid: {
@@ -287,7 +284,6 @@ const styles = StyleSheet.create({
   statBox: {
     flex: 1,
     minWidth: '45%',
-    backgroundColor: '#fefcf4',
     borderRadius: 24,
     padding: 16,
     alignItems: 'center',
@@ -300,6 +296,5 @@ const styles = StyleSheet.create({
   statCount: {
     fontSize: 18,
     fontWeight: '900',
-    color: '#2c2b29',
   },
 });

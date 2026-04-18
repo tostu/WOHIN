@@ -8,20 +8,17 @@ import {
   ActivityIndicator,
   Linking,
   Platform,
+  ScrollView,
 } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { MapPin, Navigation, ExternalLink } from "lucide-react-native";
+import { MapPin, Navigation } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { api } from "@/lib/api";
 import { Location } from "@/components/discovery/location-card";
+import { LocationCardSkeleton } from "@/components/discovery/location-card-skeleton";
 import { useLocation } from "@/hooks/use-location";
-
-const themeMap: Record<string, string> = {
-  matcha: "#a8e6cf",
-  peach: "#ffb7b2",
-  sunny: "#ffd97d",
-};
+import { useAppTheme } from "@/hooks/use-app-theme";
 
 function openInMaps(lat: number, lng: number, name: string) {
   const label = encodeURIComponent(name);
@@ -40,12 +37,20 @@ function LocationMapCard({
   location: Location;
   onPress: () => void;
 }) {
+  const theme = useAppTheme();
+  
+  const themeMap: Record<string, string> = {
+    matcha: theme.accent.matcha,
+    peach: theme.accent.peach,
+    sunny: theme.accent.sunny,
+  };
+
   const color =
-    themeMap[location.activities[0]?.themeColor] || "#ffb7b2";
+    themeMap[location.activities[0]?.themeColor] || theme.accent.peach;
   const hasCoords = location.coordinates?.lat != null;
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
+    <TouchableOpacity style={[styles.card, { backgroundColor: theme.surface, shadowColor: theme.shadow }]} onPress={onPress} activeOpacity={0.9}>
       <View style={styles.cardRow}>
         <View style={[styles.imageBox, { backgroundColor: color + "30" }]}>
           {location.image ? (
@@ -63,13 +68,13 @@ function LocationMapCard({
         </View>
 
         <View style={styles.cardContent}>
-          <Text style={styles.cardName} numberOfLines={1}>
+          <Text style={[styles.cardName, { color: theme.ink }]} numberOfLines={1}>
             {location.name}
           </Text>
           {location.address && (
             <View style={styles.addressRow}>
-              <MapPin size={11} color="#8b8a87" />
-              <Text style={styles.cardAddress} numberOfLines={1}>
+              <MapPin size={11} color={theme.muted} />
+              <Text style={[styles.cardAddress, { color: theme.muted }]} numberOfLines={1}>
                 {location.distance != null ? `${location.distance.toFixed(1)}km · ` : ''}
                 {location.address}
               </Text>
@@ -77,7 +82,7 @@ function LocationMapCard({
           )}
           {location.activities[0] && (
             <View style={[styles.tag, { backgroundColor: color + "40" }]}>
-              <Text style={styles.tagText}>
+              <Text style={[styles.tagText, { color: theme.ink }]}>
                 {location.activities[0].icon} {location.activities[0].name}
               </Text>
             </View>
@@ -108,6 +113,7 @@ export default function MapScreen() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { location: userLocation } = useLocation();
+  const theme = useAppTheme();
 
   useEffect(() => {
     const queryParams = userLocation 
@@ -123,9 +129,18 @@ export default function MapScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#ffb7b2" />
-      </View>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={["top"]}>
+        <View style={styles.header}>
+          <Text style={[styles.subTitle, { color: theme.muted }]}>BERLIN · ALL SPOTS</Text>
+          <Text style={[styles.title, { color: theme.ink }]}>On the Map</Text>
+        </View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <LocationCardSkeleton />
+          <LocationCardSkeleton />
+          <LocationCardSkeleton />
+          <LocationCardSkeleton />
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
@@ -133,11 +148,11 @@ export default function MapScreen() {
   const withoutCoords = locations.filter((l) => !l.coordinates?.lat);
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={["top"]}>
       <View style={styles.header}>
-        <Text style={styles.subTitle}>BERLIN · ALL SPOTS</Text>
-        <Text style={styles.title}>On the Map</Text>
-        <Text style={styles.desc}>
+        <Text style={[styles.subTitle, { color: theme.muted }]}>BERLIN · ALL SPOTS</Text>
+        <Text style={[styles.title, { color: theme.ink }]}>On the Map</Text>
+        <Text style={[styles.desc, { color: theme.muted }]}>
           {withCoords.length} spot{withCoords.length !== 1 ? "s" : ""} with
           directions
         </Text>
@@ -162,13 +177,11 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fefcf4",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fefcf4",
   },
   header: {
     paddingHorizontal: 20,
@@ -178,19 +191,16 @@ const styles = StyleSheet.create({
   subTitle: {
     fontSize: 10,
     fontWeight: "900",
-    color: "#8b8a87",
     letterSpacing: 2,
     marginBottom: 4,
   },
   title: {
     fontSize: 36,
     fontWeight: "900",
-    color: "#2c2b29",
     letterSpacing: -1,
   },
   desc: {
     fontSize: 13,
-    color: "#8b8a87",
     fontWeight: "600",
     marginTop: 4,
   },
@@ -199,11 +209,9 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   card: {
-    backgroundColor: "#fff",
     borderRadius: 24,
     padding: 14,
     marginBottom: 12,
-    shadowColor: "#2c2b29",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
     shadowRadius: 12,
@@ -233,7 +241,6 @@ const styles = StyleSheet.create({
   cardName: {
     fontSize: 16,
     fontWeight: "900",
-    color: "#2c2b29",
   },
   addressRow: {
     flexDirection: "row",
@@ -242,7 +249,6 @@ const styles = StyleSheet.create({
   },
   cardAddress: {
     fontSize: 12,
-    color: "#8b8a87",
     fontWeight: "500",
     flex: 1,
   },
@@ -256,7 +262,6 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 10,
     fontWeight: "700",
-    color: "#2c2b29",
   },
   navButton: {
     width: 40,

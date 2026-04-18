@@ -1,5 +1,6 @@
 import React from "react";
 import { Text, View, StyleSheet, Linking } from "react-native";
+import { useAppTheme } from "@/hooks/use-app-theme";
 
 interface PortableTextSpan {
   _type: "span";
@@ -20,6 +21,7 @@ function renderSpan(
   span: PortableTextSpan,
   markDefs: PortableTextBlock["markDefs"],
   index: number,
+  theme: any,
 ) {
   const style: any[] = [];
   let onPress: (() => void) | undefined;
@@ -30,7 +32,7 @@ function renderSpan(
     else {
       const def = markDefs?.find((d) => d._key === mark);
       if (def?._type === "link" && def.href) {
-        style.push(styles.link);
+        style.push([styles.link, { color: theme.accent.peach }]);
         const href = def.href;
         onPress = () => Linking.openURL(href);
       }
@@ -44,22 +46,22 @@ function renderSpan(
   );
 }
 
-function renderBlock(block: PortableTextBlock, index: number) {
+function renderBlock(block: PortableTextBlock, index: number, theme: any) {
   const blockStyle =
     block.style === "h1"
-      ? styles.h1
+      ? [styles.h1, { color: theme.ink }]
       : block.style === "h2"
-        ? styles.h2
+        ? [styles.h2, { color: theme.ink }]
         : block.style === "h3"
-          ? styles.h3
+          ? [styles.h3, { color: theme.ink }]
           : block.style === "blockquote"
-            ? styles.blockquote
-            : styles.paragraph;
+            ? [styles.blockquote, { color: theme.muted, borderLeftColor: theme.accent.peach }]
+            : [styles.paragraph, { color: theme.ink }];
 
   const content = (
     <Text key={block._key ?? index} style={blockStyle}>
       {block.children?.map((child, i) =>
-        renderSpan(child, block.markDefs, i),
+        renderSpan(child, block.markDefs, i, theme),
       )}
     </Text>
   );
@@ -67,7 +69,7 @@ function renderBlock(block: PortableTextBlock, index: number) {
   if (block.listItem === "bullet") {
     return (
       <View key={block._key ?? index} style={styles.bulletRow}>
-        <Text style={styles.bullet}>•</Text>
+        <Text style={[styles.bullet, { color: theme.ink }]}>•</Text>
         {content}
       </View>
     );
@@ -77,28 +79,27 @@ function renderBlock(block: PortableTextBlock, index: number) {
 }
 
 export function PortableText({ value }: { value: PortableTextBlock[] }) {
+  const theme = useAppTheme();
   if (!value?.length) return null;
-  return <View style={styles.container}>{value.map(renderBlock)}</View>;
+  return <View style={styles.container}>{value.map((block, i) => renderBlock(block, i, theme))}</View>;
 }
 
 const styles = StyleSheet.create({
   container: { gap: 8 },
-  paragraph: { fontSize: 16, lineHeight: 24, color: "#2c2b29", opacity: 0.8 },
-  h1: { fontSize: 28, fontWeight: "900", color: "#2c2b29" },
-  h2: { fontSize: 22, fontWeight: "900", color: "#2c2b29" },
-  h3: { fontSize: 18, fontWeight: "800", color: "#2c2b29" },
+  paragraph: { fontSize: 16, lineHeight: 24, opacity: 0.8 },
+  h1: { fontSize: 28, fontWeight: "900" },
+  h2: { fontSize: 22, fontWeight: "900" },
+  h3: { fontSize: 18, fontWeight: "800" },
   blockquote: {
     fontSize: 16,
     lineHeight: 24,
-    color: "#8b8a87",
     fontStyle: "italic",
     borderLeftWidth: 3,
-    borderLeftColor: "#ffb7b2",
     paddingLeft: 12,
   },
   bold: { fontWeight: "700" },
   italic: { fontStyle: "italic" },
-  link: { color: "#ffb7b2", textDecorationLine: "underline" },
+  link: { textDecorationLine: "underline" },
   bulletRow: { flexDirection: "row", gap: 8, paddingLeft: 4 },
-  bullet: { fontSize: 16, color: "#2c2b29", opacity: 0.5 },
+  bullet: { fontSize: 16, opacity: 0.5 },
 });

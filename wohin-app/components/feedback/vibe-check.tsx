@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
 } from "react-native";
 import { api } from "@/lib/api";
 import Animated, {
@@ -14,12 +13,13 @@ import Animated, {
   withTiming,
   useSharedValue,
 } from "react-native-reanimated";
+import { useAppTheme } from "@/hooks/use-app-theme";
 
-const vibes = [
-  { id: "sparkle", emoji: "✨", label: "Sparkle", bg: "#deffaf40" },
-  { id: "fire", emoji: "🔥", label: "Fire", bg: "#ff9e6d30" },
-  { id: "chill", emoji: "🧊", label: "Chill", bg: "#6dbdff30" },
-  { id: "nope", emoji: "👎", label: "Nope", bg: "#8b8a8720" },
+const vibesData = [
+  { id: "sparkle", emoji: "✨", label: "Sparkle", color: "matcha" },
+  { id: "fire", emoji: "🔥", label: "Fire", color: "peach" },
+  { id: "chill", emoji: "🧊", label: "Chill", color: "sunny" },
+  { id: "nope", emoji: "👎", label: "Nope", color: "muted" },
 ];
 
 export function VibeCheck({
@@ -33,9 +33,27 @@ export function VibeCheck({
 }) {
   const [currentVibe, setCurrentVibe] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const theme = useAppTheme();
+  
+  // Animation values for each vibe
+  const scales = {
+    sparkle: useSharedValue(1),
+    fire: useSharedValue(1),
+    chill: useSharedValue(1),
+    nope: useSharedValue(1),
+  };
 
   const dropVibe = async (vibeId: string) => {
     if (submitting) return;
+
+    // Trigger animation
+    const scale = (scales as any)[vibeId];
+    if (scale) {
+      scale.value = withSequence(
+        withSpring(1.3, { damping: 10, stiffness: 100 }),
+        withSpring(1, { damping: 10, stiffness: 100 })
+      );
+    }
 
     setSubmitting(true);
     setCurrentVibe(vibeId);
@@ -54,28 +72,51 @@ export function VibeCheck({
     }
   };
 
+  const getVibeStyle = (id: string, colorKey: string) => {
+    const scale = (scales as any)[id];
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+    }));
+
+    let backgroundColor = theme.surface;
+    if (colorKey === 'matcha') backgroundColor = theme.accent.matcha + '40';
+    else if (colorKey === 'peach') backgroundColor = theme.accent.peach + '40';
+    else if (colorKey === 'sunny') backgroundColor = theme.accent.sunny + '40';
+    else backgroundColor = theme.muted + '20';
+
+    return { animatedStyle, backgroundColor };
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>DROP A VIBE</Text>
-        {currentVibe && <Text style={styles.successText}>Vibe sent! 💌</Text>}
+        <Text style={[styles.title, { color: theme.muted }]}>DROP A VIBE</Text>
+        {currentVibe && <Text style={[styles.successText, { color: theme.accent.peach }]}>Vibe sent! 💌</Text>}
       </View>
 
       <View style={styles.vibesGrid}>
-        {vibes.map((vibe) => (
-          <TouchableOpacity
-            key={vibe.id}
-            style={[
-              styles.vibeButton,
-              { backgroundColor: vibe.bg },
-              currentVibe === vibe.id && styles.activeVibe,
-            ]}
-            onPress={() => dropVibe(vibe.id)}
-            disabled={submitting}
-          >
-            <Text style={styles.emoji}>{vibe.emoji}</Text>
-          </TouchableOpacity>
-        ))}
+        {vibesData.map((vibe) => {
+          const { animatedStyle, backgroundColor } = getVibeStyle(vibe.id, vibe.color);
+          return (
+            <TouchableOpacity
+              key={vibe.id}
+              onPress={() => dropVibe(vibe.id)}
+              disabled={submitting}
+              activeOpacity={0.7}
+            >
+              <Animated.View
+                style={[
+                  styles.vibeButton,
+                  { backgroundColor },
+                  currentVibe === vibe.id && { borderColor: theme.accent.peach, borderWidth: 3 },
+                  animatedStyle,
+                ]}
+              >
+                <Text style={styles.emoji}>{vibe.emoji}</Text>
+              </Animated.View>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </View>
   );
@@ -94,13 +135,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 12,
     fontWeight: "900",
-    color: "#8b8a87",
     letterSpacing: 2,
   },
   successText: {
     fontSize: 10,
     fontWeight: "700",
-    color: "#ffb7b2",
   },
   vibesGrid: {
     flexDirection: "row",
@@ -112,11 +151,6 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff",
-  },
-  activeVibe: {
-    borderWidth: 3,
-    borderColor: "#ffb7b2",
   },
   emoji: {
     fontSize: 32,

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
+  RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,8 +18,8 @@ import {
   Location,
   Activity,
 } from "@/components/discovery/location-card";
-import { Colors, Fonts } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { LocationCardSkeleton } from "@/components/discovery/location-card-skeleton";
+import { useAppTheme } from "@/hooks/use-app-theme";
 import { Link } from "expo-router";
 import { useFavorites } from "@/hooks/use-favorites";
 import { shareLocation } from "@/lib/share";
@@ -29,42 +30,90 @@ export default function HomeScreen() {
   const [newArrivals, setNewArrivals] = useState<Location[]>([]);
   const [trendingSpots, setTrendingSpots] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Location[] | null>(null);
   const [searching, setSearching] = useState(false);
-  const colorScheme = useColorScheme() ?? "light";
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+  const [filteredLocations, setFilteredLocations] = useState<Location[]>([]);
+  const [filtering, setFiltering] = useState(false);
+  
+  const theme = useAppTheme();
   const { isFavorited, toggle: toggleFavorite } = useFavorites();
   const { location: userLocation } = useLocation();
 
+  const loadData = useCallback(async (isRefresh = false) => {
+    if (!isRefresh) setLoading(true);
+    setError(null);
+    try {
+      const queryParams = userLocation 
+        ? `?lat=${userLocation.latitude}&lng=${userLocation.longitude}`
+        : "";
+
+      const [activitiesRes, featuredRes] = await Promise.all([
+        api.get<{ activities: Activity[] }>("/api/v1/discovery/activities"),
+        api.get<{ results: Location[] }>(
+          `/api/v1/discovery/featured${queryParams}${userLocation ? "&" : "?"}limit=10`,
+        ),
+      ]);
+
+      setActivities(activitiesRes.activities);
+      setNewArrivals(featuredRes.results.slice(0, 3));
+      setTrendingSpots(featuredRes.results.slice(3, 7));
+      
+      // Reset filtering state on full load/refresh
+      setSelectedActivityId(null);
+      setSearchResults(null);
+      setSearchQuery("");
+    } catch (e) {
+      console.error("Failed to load home data:", e);
+      setError("Unable to reach the magic. Check your connection!");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [userLocation]);
+
   useEffect(() => {
-    async function loadData() {
-      try {
-        const queryParams = userLocation 
-          ? `?lat=${userLocation.latitude}&lng=${userLocation.longitude}`
-          : "";
+    loadData();
+  }, [loadData]);
 
-        const [activitiesRes, featuredRes] = await Promise.all([
-          api.get<{ activities: Activity[] }>("/api/v1/discovery/activities"),
-          api.get<{ results: Location[] }>(
-            `/api/v1/discovery/featured${queryParams}${userLocation ? "&" : "?"}limit=10`,
-          ),
-        ]);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    loadData(true);
+  }, [loadData]);
 
-        setActivities(activitiesRes.activities);
-        setNewArrivals(featuredRes.results.slice(0, 3));
-        setTrendingSpots(featuredRes.results.slice(3, 7));
-      } catch (e) {
-        console.error("Failed to load home data:", e);
-      } finally {
-        setLoading(false);
-      }
+  const handleActivityPress = async (activityId: string | null) => {
+    setSelectedActivityId(activityId);
+    setSearchQuery("");
+    setSearchResults(null);
+    
+    if (activityId === null) {
+      setFilteredLocations([]);
+      return;
     }
 
-    loadData();
-  }, [userLocation]);
+    setFiltering(true);
+    try {
+      const queryParams = userLocation 
+        ? `&lat=${userLocation.latitude}&lng=${userLocation.longitude}`
+        : "";
+      const res = await api.get<{ results: Location[] }>(
+        `/api/v1/discovery/search?activityId=${activityId}${queryParams}`,
+      );
+      setFilteredLocations(res.results);
+    } catch (e) {
+      console.error("Failed to filter by activity:", e);
+      setFilteredLocations([]);
+    } finally {
+      setFiltering(false);
+    }
+  };
 
   const handleSearch = useCallback(async (query: string) => {
     setSearchQuery(query);
+    setSelectedActivityId(null); // Clear activity filter when searching
     if (!query.trim()) {
       setSearchResults(null);
       return;
@@ -90,81 +139,120 @@ export default function HomeScreen() {
     setSearchResults(null);
   };
 
-  const getActivityColor = (theme?: string) => {
-    switch (theme) {
+  const getActivityColor = (themeName?: string) => {
+    switch (themeName) {
       case "matcha":
-        return "#a8e6cf";
+        return theme.accent.matcha;
       case "peach":
-        return "#ffb7b2";
+        return theme.accent.peach;
       case "sunny":
-        return "#ffd97d";
+        return theme.accent.sunny;
       default:
-        return "#ffd97d";
+        return theme.accent.sunny;
     }
   };
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#ffb7b2" />
-      </View>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={["top"]}>
+        <View style={styles.header}>
+          <Text style={[styles.subTitle, { color: theme.muted }]}>BERLIN · TODAY</Text>
+          <Text style={[styles.title, { color: theme.ink }]}>
+            Whatcha <Text style={styles.italic}>wanna</Text> do?
+          </Text>
+        </View>
+        <ScrollView showsVerticalScrollIndicator={false} style={{ marginTop: 20 }}>
+          <LocationCardSkeleton />
+          <LocationCardSkeleton />
+          <LocationCardSkeleton />
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  if (error && !activities.length) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={["top"]}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorEmoji}>⚡</Text>
+          <Text style={[styles.errorTitle, { color: theme.ink }]}>Signal Lost</Text>
+          <Text style={[styles.errorText, { color: theme.muted }]}>{error}</Text>
+          <TouchableOpacity 
+            style={[styles.retryButton, { backgroundColor: theme.accent.peach }]} 
+            onPress={() => loadData()}
+          >
+            <Text style={styles.retryText}>Try Again</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={["top"]}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            tintColor={theme.accent.peach}
+            colors={[theme.accent.peach]}
+          />
+        }
+      >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.subTitle}>BERLIN · TODAY</Text>
-          <Text style={styles.title}>
+          <Text style={[styles.subTitle, { color: theme.muted }]}>BERLIN · TODAY</Text>
+          <Text style={[styles.title, { color: theme.ink }]}>
             Whatcha <Text style={styles.italic}>wanna</Text> do?
           </Text>
         </View>
 
         {/* Search Bar */}
         <View style={styles.searchContainer}>
-          <View style={styles.searchBar}>
-            <Search size={18} color="#8b8a87" />
+          <View style={[styles.searchBar, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
+            <Search size={18} color={theme.muted} />
             <TextInput
-              style={styles.searchInput}
+              style={[styles.searchInput, { color: theme.ink }]}
               placeholder="Search spots..."
-              placeholderTextColor="#8b8a87"
+              placeholderTextColor={theme.muted}
               value={searchQuery}
               onChangeText={handleSearch}
               returnKeyType="search"
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={clearSearch}>
-                <X size={18} color="#8b8a87" />
+                <X size={18} color={theme.muted} />
               </TouchableOpacity>
             )}
           </View>
         </View>
 
-        {/* Search Results */}
-        {searchResults !== null ? (
+        {/* Search or Filter Results */}
+        {(searchResults !== null || selectedActivityId !== null) ? (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>
-                {searching
-                  ? "Searching..."
-                  : `${searchResults.length} result${searchResults.length !== 1 ? "s" : ""}`}
+              <Text style={[styles.sectionTitle, { color: theme.ink }]}>
+                {searching || filtering
+                  ? "Loading..."
+                  : selectedActivityId 
+                    ? `${filteredLocations.length} result${filteredLocations.length !== 1 ? "s" : ""} for ${activities.find(a => a.id === selectedActivityId)?.name}`
+                    : `${searchResults!.length} result${searchResults!.length !== 1 ? "s" : ""}`}
               </Text>
             </View>
-            {searching ? (
-              <ActivityIndicator
-                size="small"
-                color="#ffb7b2"
-                style={{ marginTop: 20 }}
-              />
-            ) : searchResults.length > 0 ? (
-              searchResults.map((location) => (
+            {searching || filtering ? (
+              <View style={{ marginTop: 20 }}>
+                <LocationCardSkeleton />
+                <LocationCardSkeleton />
+              </View>
+            ) : (selectedActivityId ? filteredLocations : searchResults!).length > 0 ? (
+              (selectedActivityId ? filteredLocations : searchResults!).map((location) => (
                 <LocationCard key={location.id} location={location} isFavorited={isFavorited(location.id)} onFavorite={toggleFavorite} onShare={shareLocation} />
               ))
             ) : (
-              <Text style={styles.emptySearch}>
-                No spots found. Try a different search!
+              <Text style={[styles.emptySearch, { color: theme.muted }]}>
+                No spots found. Try a different mood! ✨
               </Text>
             )}
             <View style={{ height: 100 }} />
@@ -178,28 +266,49 @@ export default function HomeScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.activitiesContainer}
         >
-          {activities.map((activity) => (
-            <TouchableOpacity
-              key={activity.id}
-              style={[
-                styles.activityPill,
-                { backgroundColor: "#fff", borderColor: "#2c2b2910" },
-              ]}
-            >
-              {activity.icon && (
-                <Text style={styles.activityIcon}>{activity.icon}</Text>
-              )}
-              <Text style={styles.activityName}>{activity.name}</Text>
-            </TouchableOpacity>
-          ))}
+          <TouchableOpacity
+            style={[
+              styles.activityPill,
+              { 
+                backgroundColor: selectedActivityId === null ? theme.accent.peach : theme.surface, 
+                borderColor: selectedActivityId === null ? theme.accent.peach : theme.border 
+              },
+            ]}
+            onPress={() => handleActivityPress(null)}
+          >
+            <Text style={[styles.activityName, { color: selectedActivityId === null ? "#fff" : theme.ink }]}>All</Text>
+          </TouchableOpacity>
+
+          {activities.map((activity) => {
+            const isSelected = selectedActivityId === activity.id;
+            const activeColor = getActivityColor(activity.themeColor);
+            return (
+              <TouchableOpacity
+                key={activity.id}
+                style={[
+                  styles.activityPill,
+                  { 
+                    backgroundColor: isSelected ? activeColor : theme.surface, 
+                    borderColor: isSelected ? activeColor : theme.border 
+                  },
+                ]}
+                onPress={() => handleActivityPress(activity.id)}
+              >
+                {activity.icon && (
+                  <Text style={styles.activityIcon}>{activity.icon}</Text>
+                )}
+                <Text style={[styles.activityName, { color: isSelected ? "#fff" : theme.ink }]}>{activity.name}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
         {/* Trending Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Trending</Text>
+            <Text style={[styles.sectionTitle, { color: theme.ink }]}>Trending</Text>
             <TouchableOpacity>
-              <Text style={styles.seeAll}>See all</Text>
+              <Text style={[styles.seeAll, { color: theme.muted }]}>See all</Text>
             </TouchableOpacity>
           </View>
 
@@ -210,7 +319,7 @@ export default function HomeScreen() {
           >
             {trendingSpots.map((spot) => (
               <Link key={spot.id} href={`/location/${spot.slug}`} asChild>
-                <TouchableOpacity style={styles.trendingCard}>
+                <TouchableOpacity style={[styles.trendingCard, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
                   <View style={styles.trendingImageContainer}>
                     {spot.image ? (
                       <Image
@@ -237,10 +346,10 @@ export default function HomeScreen() {
                     )}
                   </View>
                   <View style={styles.trendingContent}>
-                    <Text style={styles.trendingName} numberOfLines={1}>
+                    <Text style={[styles.trendingName, { color: theme.ink }]} numberOfLines={1}>
                       {spot.name}
                     </Text>
-                    <Text style={styles.trendingAddress} numberOfLines={1}>
+                    <Text style={[styles.trendingAddress, { color: theme.muted }]} numberOfLines={1}>
                       {spot.address?.split(",")[0] || "Berlin"}
                     </Text>
                   </View>
@@ -256,9 +365,9 @@ export default function HomeScreen() {
             <View
               style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
             >
-              <Text style={styles.sectionTitle}>Just Landed</Text>
-              <View style={styles.newBadge}>
-                <Text style={styles.newBadgeText}>NEW ✨</Text>
+              <Text style={[styles.sectionTitle, { color: theme.ink }]}>Just Landed</Text>
+              <View style={[styles.newBadge, { backgroundColor: theme.accent.matcha }]}>
+                <Text style={[styles.newBadgeText, { color: theme.ink }]}>NEW ✨</Text>
               </View>
             </View>
           </View>
@@ -279,13 +388,11 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fefcf4",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fefcf4",
   },
   header: {
     paddingHorizontal: 20,
@@ -295,14 +402,12 @@ const styles = StyleSheet.create({
   subTitle: {
     fontSize: 10,
     fontWeight: "900",
-    color: "#8b8a87",
     letterSpacing: 2,
     marginBottom: 4,
   },
   title: {
     fontSize: 36,
     fontWeight: "900",
-    color: "#2c2b29",
     letterSpacing: -1,
   },
   italic: {
@@ -328,7 +433,6 @@ const styles = StyleSheet.create({
   activityName: {
     fontSize: 16,
     fontWeight: "900",
-    color: "#2c2b29",
   },
   section: {
     marginTop: 10,
@@ -343,12 +447,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: "900",
-    color: "#2c2b29",
   },
   seeAll: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#8b8a87",
   },
   trendingScroll: {
     paddingHorizontal: 20,
@@ -357,10 +459,8 @@ const styles = StyleSheet.create({
   },
   trendingCard: {
     width: 160,
-    backgroundColor: "#fff",
     borderRadius: 24,
     overflow: "hidden",
-    shadowColor: "#2c2b29",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 10,
@@ -386,16 +486,13 @@ const styles = StyleSheet.create({
   trendingName: {
     fontSize: 14,
     fontWeight: "900",
-    color: "#2c2b29",
     marginBottom: 2,
   },
   trendingAddress: {
     fontSize: 11,
-    color: "#8b8a87",
     fontWeight: "600",
   },
   newBadge: {
-    backgroundColor: "#a8e6cf",
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
@@ -403,7 +500,6 @@ const styles = StyleSheet.create({
   newBadgeText: {
     fontSize: 8,
     fontWeight: "900",
-    color: "#2c2b29",
   },
   searchContainer: {
     paddingHorizontal: 20,
@@ -412,12 +508,10 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 12,
     gap: 10,
-    shadowColor: "#2c2b29",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -426,14 +520,43 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: "#2c2b29",
     fontWeight: "600",
   },
   emptySearch: {
     textAlign: "center",
-    color: "#8b8a87",
     fontSize: 14,
     fontWeight: "600",
     paddingVertical: 40,
+  },
+  errorContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  errorEmoji: {
+    fontSize: 64,
+    marginBottom: 24,
+  },
+  errorTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    marginBottom: 12,
+  },
+  errorText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 32,
+    lineHeight: 24,
+  },
+  retryButton: {
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 24,
+  },
+  retryText: {
+    color: '#fff',
+    fontWeight: '900',
+    fontSize: 16,
   },
 });

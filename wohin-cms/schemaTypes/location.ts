@@ -27,6 +27,12 @@ export default defineType({
       type: 'string',
     }),
     defineField({
+      name: 'hours',
+      title: 'Opening Hours',
+      type: 'string',
+      description: 'e.g. Mon-Fri 9-18, Sat 10-16',
+    }),
+    defineField({
       name: 'coordinates',
       title: 'Coordinates',
       type: 'geopoint',

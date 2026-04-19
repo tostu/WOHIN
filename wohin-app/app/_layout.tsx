@@ -3,6 +3,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import 'react-native-reanimated';
+import '../global.css';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ErrorBoundary } from '@/components/error-boundary';

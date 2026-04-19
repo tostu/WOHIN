@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useFirstLaunch } from '@/hooks/use-first-launch';
 import { useAppTheme } from '@/hooks/use-app-theme';
@@ -64,10 +65,10 @@ export default function OnboardingScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.content}>
-        <Animated.View 
+        <Animated.View
           key={`slide-${slide.id}`}
-          entering={FadeInRight.duration(400)}
-          exiting={FadeOutLeft.duration(400)}
+          entering={Platform.OS !== 'web' ? FadeInRight.duration(400) : undefined}
+          exiting={Platform.OS !== 'web' ? FadeOutLeft.duration(400) : undefined}
           style={styles.slide}
         >
           <View style={[styles.iconContainer, { backgroundColor: accentColor + '20' }]}>

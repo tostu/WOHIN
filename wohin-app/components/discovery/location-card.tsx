@@ -44,7 +44,7 @@ const vibeEmojiMap: Record<string, string> = {
   nope: '👎',
 };
 
-function FeedbackStack({ vibeCounts }: { vibeCounts?: VibeCounts }) {
+export function FeedbackStack({ vibeCounts }: { vibeCounts?: VibeCounts }) {
   const theme = useAppTheme();
   if (!vibeCounts) return <View style={styles.feedbackStack} />;
 

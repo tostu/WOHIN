@@ -17,6 +17,7 @@ import {
   LocationCard,
   Location,
   Activity,
+  FeedbackStack,
 } from "@/components/discovery/location-card";
 import { LocationCardSkeleton } from "@/components/discovery/location-card-skeleton";
 import { useAppTheme } from "@/hooks/use-app-theme";
@@ -317,45 +318,78 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.trendingScroll}
           >
-            {trendingSpots.map((spot) => (
-              <Link key={spot.id} href={`/location/${spot.slug}`} asChild>
-                <TouchableOpacity style={[styles.trendingCard, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
-                  <View style={styles.trendingImageContainer}>
-                    {spot.image ? (
-                      <Image
-                        source={spot.image}
-                        style={styles.trendingImage}
-                        contentFit="cover"
-                        transition={200}
-                      />
-                    ) : (
-                      <View
-                        style={[
-                          styles.trendingImagePlaceholder,
-                          {
-                            backgroundColor:
-                              getActivityColor(spot.activities[0]?.themeColor) +
-                              "40",
-                          },
-                        ]}
-                      >
-                        <Text style={{ fontSize: 32 }}>
-                          {spot.activities[0]?.icon || "📍"}
+            {trendingSpots.map((spot) => {
+              const primaryActivity = spot.activities[0];
+              const accentColor = primaryActivity ? getActivityColor(primaryActivity.themeColor) : theme.accent.peach;
+              
+              return (
+                <Link key={spot.id} href={`/location/${spot.slug}`} asChild>
+                  <TouchableOpacity 
+                    activeOpacity={0.9} 
+                    style={[
+                      styles.trendingCard, 
+                      { 
+                        backgroundColor: theme.surface, 
+                        shadowColor: theme.shadow,
+                        borderColor: theme.border
+                      }
+                    ]}
+                  >
+                    <View style={styles.trendingImageContainer}>
+                      {spot.image || (spot.photos && spot.photos[0]) ? (
+                        <Image
+                          source={spot.image || spot.photos?.[0]}
+                          style={styles.trendingImage}
+                          contentFit="cover"
+                          transition={200}
+                        />
+                      ) : (
+                        <View
+                          style={[
+                            styles.trendingImagePlaceholder,
+                            {
+                              backgroundColor: accentColor + "20",
+                            },
+                          ]}
+                        >
+                          <Text style={{ fontSize: 32 }}>
+                            {primaryActivity?.icon || "📍"}
+                          </Text>
+                        </View>
+                      )}
+                      
+                      {primaryActivity && (
+                        <View style={[styles.vibeTag, { backgroundColor: accentColor }]}>
+                          <Text style={[styles.vibeTagText, { color: theme.ink }]}>
+                            {primaryActivity.name.toUpperCase()}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                    
+                    <View style={styles.trendingContent}>
+                      <Text style={[styles.trendingName, { color: theme.ink }]} numberOfLines={1}>
+                        {spot.name}
+                      </Text>
+                      <View style={styles.trendingMeta}>
+                        <Text style={[styles.trendingAddress, { color: theme.muted }]} numberOfLines={1}>
+                          {spot.address?.split(",")[0] || "Berlin"}
                         </Text>
                       </View>
-                    )}
-                  </View>
-                  <View style={styles.trendingContent}>
-                    <Text style={[styles.trendingName, { color: theme.ink }]} numberOfLines={1}>
-                      {spot.name}
-                    </Text>
-                    <Text style={[styles.trendingAddress, { color: theme.muted }]} numberOfLines={1}>
-                      {spot.address?.split(",")[0] || "Berlin"}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </Link>
-            ))}
+                      
+                      <View style={styles.trendingFooter}>
+                        <FeedbackStack vibeCounts={spot.vibeCounts} />
+                        {spot.rating > 0 && (
+                          <View style={[styles.trendingRatingBadge, { backgroundColor: theme.accent.sunny + '30' }]}>
+                            <Text style={[styles.trendingRatingText, { color: theme.ink }]}>⭐ {spot.rating.toFixed(1)}</Text>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                </Link>
+              );
+            })}
           </ScrollView>
         </View>
 
@@ -454,21 +488,27 @@ const styles = StyleSheet.create({
   },
   trendingScroll: {
     paddingHorizontal: 20,
-    gap: 16,
     paddingBottom: 24,
+    gap: 16,
   },
   trendingCard: {
-    width: 160,
-    borderRadius: 24,
-    overflow: "hidden",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    width: 200,
+    height: 280,
+    borderRadius: 32,
+    padding: 12,
+    borderWidth: 1,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 5,
+    flexShrink: 0,
   },
   trendingImageContainer: {
-    height: 120,
-    width: "100%",
+    height: 140,
+    width: 174,
+    borderRadius: 24,
+    overflow: "hidden",
+    position: "relative",
   },
   trendingImage: {
     width: "100%",
@@ -480,17 +520,55 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  vibeTag: {
+    position: "absolute",
+    bottom: 8,
+    left: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  vibeTagText: {
+    fontSize: 8,
+    fontWeight: "900",
+    letterSpacing: 1,
+  },
   trendingContent: {
-    padding: 12,
+    flex: 1,
+    paddingTop: 12,
+    justifyContent: "space-between",
   },
   trendingName: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: "900",
-    marginBottom: 2,
+  },
+  trendingMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
   },
   trendingAddress: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "600",
+    flex: 1,
+  },
+  trendingFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  trendingRatingBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  trendingRatingText: {
+    fontSize: 10,
+    fontWeight: "900",
   },
   newBadge: {
     paddingHorizontal: 8,

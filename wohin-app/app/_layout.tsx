@@ -2,6 +2,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
+import { View, StyleSheet, Platform } from 'react-native';
 import 'react-native-reanimated';
 import '../global.css';
 
@@ -50,7 +51,31 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <ErrorBoundary>
-      <RootLayoutNav />
+      <View style={styles.rootContainer}>
+        <View style={styles.appContainer}>
+          <RootLayoutNav />
+        </View>
+      </View>
     </ErrorBoundary>
   );
 }
+
+const styles = StyleSheet.create({
+  rootContainer: {
+    flex: 1,
+    alignItems: 'center',
+    // On web, the body background is handled by global.css
+  },
+  appContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: Platform.OS === 'web' ? 1280 : '100%',
+    ...Platform.select({
+      web: {
+        // The background colors for web will follow the default theme
+        // Dark mode is handled by React Navigation theme inside RootLayoutNav
+        backgroundColor: 'transparent',
+      },
+    }),
+  },
+});

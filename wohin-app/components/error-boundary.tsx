@@ -40,7 +40,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </View>
             <Text style={styles.title}>Oops, something slipped.</Text>
             <Text style={styles.message}>
-              Even the best vibes sometimes trip. We've logged the issue and are working on a fix!
+              Even the best vibes sometimes trip. We&apos;ve logged the issue and are working on a fix!
             </Text>
             {__DEV__ && (
               <View style={styles.debugContainer}>

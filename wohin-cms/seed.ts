@@ -216,6 +216,47 @@ async function seed() {
     }
   }
 
+  console.log('Seeding curated lists...')
+  const locs = await client.fetch(`*[_type == "location"]{_id, "slug": slug.current}`)
+  const locMap = locs.reduce((acc: any, curr: any) => {
+    acc[curr.slug] = curr._id
+    return acc
+  }, {})
+
+  const curatedLists = [
+    {
+      _id: 'list-matcha-focus',
+      _type: 'curatedList',
+      title: 'Matcha & Focus',
+      slug: {_type: 'slug', current: 'matcha-focus'},
+      emoji: '🍵',
+      description: 'The absolute best spots in Berlin for quiet contemplation, deep work, or reading your favorite book.',
+      locations: [
+        {_type: 'reference', _ref: locMap['cafe-morgenrot']},
+        {_type: 'reference', _ref: locMap['tempelhofer-feld']},
+        {_type: 'reference', _ref: locMap['prinzessinnengaerten']},
+      ].filter((l: any) => l._ref),
+    },
+    {
+      _id: 'list-late-night-socials',
+      _type: 'curatedList',
+      title: 'Late Night Socials',
+      slug: {_type: 'slug', current: 'late-night-socials'},
+      emoji: '🪩',
+      description: 'Rooftops, canals, and techno gardens where the music is crisp and the vibes are alive.',
+      locations: [
+        {_type: 'reference', _ref: locMap['klunkerkranich']},
+        {_type: 'reference', _ref: locMap['sisyphos']},
+        {_type: 'reference', _ref: locMap['holzmarkt-25']},
+      ].filter((l: any) => l._ref),
+    },
+  ]
+
+  for (const list of curatedLists) {
+    await client.createOrReplace(list)
+    console.log(`Created/Updated curated list: ${list.title}`)
+  }
+
   console.log('Seeding complete! ✨')
 }
 

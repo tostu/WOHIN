@@ -45,7 +45,7 @@ export function OfflineBanner() {
     >
       <View style={styles.content}>
         <CloudOff size={16} color="#fff" />
-        <Text style={styles.text}>Nap Mode: You're currently offline. ✨</Text>
+        <Text style={styles.text}>Nap Mode: You&apos;re currently offline. ✨</Text>
       </View>
     </Animated.View>
   );

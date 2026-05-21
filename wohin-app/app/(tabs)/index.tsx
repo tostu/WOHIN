@@ -379,7 +379,7 @@ export default function HomeScreen() {
                       
                       <View style={styles.trendingFooter}>
                         <FeedbackStack vibeCounts={spot.vibeCounts} />
-                        {spot.rating > 0 && (
+                        {spot.rating != null && spot.rating > 0 && (
                           <View style={[styles.trendingRatingBadge, { backgroundColor: theme.accent.sunny + '30' }]}>
                             <Text style={[styles.trendingRatingText, { color: theme.ink }]}>⭐ {spot.rating.toFixed(1)}</Text>
                           </View>

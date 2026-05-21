@@ -24,6 +24,16 @@ export interface LocationSearchResult {
   vibeCounts?: Record<string, number>;
 }
 
+export interface CuratedList {
+  id: string;
+  title: string;
+  slug: string;
+  emoji?: string;
+  description?: string;
+  locations: LocationSearchResult[];
+}
+
+
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // km
   const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -213,5 +223,94 @@ export class DiscoveryService {
     }
 
     return location;
+  }
+
+  static async getCuratedLists(env: CloudflareBindings, db: any): Promise<CuratedList[]> {
+    const client = getSanityClient(env);
+    const query = `*[_type == "curatedList"]{
+      "id": _id,
+      title,
+      "slug": slug.current,
+      emoji,
+      description,
+      "locations": locations[]->{
+        "id": _id,
+        name,
+        "slug": slug.current,
+        address,
+        hours,
+        coordinates,
+        "image": image.asset->url + "?w=800&q=80&auto=format",
+        "photos": photos[].asset->url + "?w=800&q=80&auto=format",
+        "activities": activities[]->{
+          "id": _id,
+          name,
+          "slug": slug.current,
+          themeColor,
+          icon
+        }
+      }
+    }`;
+    const lists: CuratedList[] = await client.fetch(query);
+
+    for (const list of lists) {
+      if (list.locations && list.locations.length > 0) {
+        try {
+          const summaries = await FeedbackService.getVibeSummaryForLocations(db, list.locations.map(l => l.id));
+          list.locations = list.locations.map(loc => ({
+            ...loc,
+            rating: summaries[loc.id]?.rating || 0,
+            vibeCounts: summaries[loc.id]?.counts
+          }));
+        } catch (e) {
+          console.error("Failed to enrich curated list locations:", e);
+        }
+      }
+    }
+    return lists;
+  }
+
+  static async getCuratedListBySlug(env: CloudflareBindings, db: any, slug: string): Promise<CuratedList | null> {
+    const client = getSanityClient(env);
+    const query = `*[_type == "curatedList" && slug.current == $slug][0]{
+      "id": _id,
+      title,
+      "slug": slug.current,
+      emoji,
+      description,
+      "locations": locations[]->{
+        "id": _id,
+        name,
+        "slug": slug.current,
+        address,
+        hours,
+        coordinates,
+        "image": image.asset->url + "?w=800&q=80&auto=format",
+        "photos": photos[].asset->url + "?w=800&q=80&auto=format",
+        "activities": activities[]->{
+          "id": _id,
+          name,
+          "slug": slug.current,
+          themeColor,
+          icon
+        }
+      }
+    }`;
+    const list: CuratedList | null = await client.fetch(query, { slug });
+    if (!list) return null;
+
+    if (list.locations && list.locations.length > 0) {
+      try {
+        const summaries = await FeedbackService.getVibeSummaryForLocations(db, list.locations.map(l => l.id));
+        list.locations = list.locations.map(loc => ({
+          ...loc,
+          rating: summaries[loc.id]?.rating || 0,
+          vibeCounts: summaries[loc.id]?.counts
+        }));
+      } catch (e) {
+        console.error("Failed to enrich single curated list locations:", e);
+      }
+    }
+    return list;
   }
 }

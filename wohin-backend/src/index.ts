@@ -74,6 +74,20 @@ app.get("/api/v1/discovery/activities", async (c) => {
   return c.json({ activities });
 });
 
+// Curated Lists API
+app.get("/api/v1/discovery/lists", async (c) => {
+  const results = await DiscoveryService.getCuratedLists(c.env, c.env.DB);
+  return c.json({ results });
+});
+
+app.get("/api/v1/discovery/lists/:slug", async (c) => {
+  const slug = c.req.param("slug");
+  const list = await DiscoveryService.getCuratedListBySlug(c.env, c.env.DB, slug);
+  if (!list) return c.json({ error: "Curated list not found" }, 404);
+  return c.json(list);
+});
+
+
 // Feedback API
 app.get("/api/v1/feedback/location/:id", async (c) => {
   const id = c.req.param("id");

@@ -32,6 +32,15 @@ interface Vibe {
   ink: "light" | "dark";
 }
 
+interface CuratedList {
+  id: string;
+  title: string;
+  slug: string;
+  emoji?: string;
+  description?: string;
+  locations: Location[];
+}
+
 const vibes: Vibe[] = [
   {
     id: "cozy",
@@ -125,20 +134,26 @@ const vibes: Vibe[] = [
 
 export default function DiscoverScreen() {
   const [activeVibe, setActiveVibe] = useState<Vibe | null>(null);
+  const [activeList, setActiveList] = useState<CuratedList | null>(null);
   const [results, setResults] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [featured, setFeatured] = useState<Location[]>([]);
+  const [curatedLists, setCuratedLists] = useState<CuratedList[]>([]);
   const { isFavorited, toggle: toggleFavorite } = useFavorites();
   const theme = useAppTheme();
 
   const loadData = useCallback(async (isRefresh = false) => {
     if (!isRefresh) setLoading(true);
     try {
-      const res = await api.get<{ results: Location[] }>("/api/v1/discovery/featured?limit=40");
-      setFeatured(res.results);
+      const [featuredRes, listsRes] = await Promise.all([
+        api.get<{ results: Location[] }>("/api/v1/discovery/featured?limit=40"),
+        api.get<{ results: CuratedList[] }>("/api/v1/discovery/lists")
+      ]);
+      setFeatured(featuredRes.results || []);
+      setCuratedLists(listsRes.results || []);
     } catch (e) {
-      console.error("Failed to load featured spots:", e);
+      console.error("Failed to load featured spots & curated lists:", e);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -156,6 +171,7 @@ export default function DiscoverScreen() {
 
   const openVibe = (vibe: Vibe) => {
     setActiveVibe(vibe);
+    setActiveList(null);
     setLoading(true);
 
     // Simple client-side filtering like in SvelteKit
@@ -171,28 +187,68 @@ export default function DiscoverScreen() {
     setResults(matches);
     setLoading(false);
   };
-return (
-  <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-    <ScrollView 
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl 
-          refreshing={refreshing} 
-          onRefresh={onRefresh} 
-          tintColor={theme.accent.peach}
-          colors={[theme.accent.peach]}
-        />
-      }
-    >
+
+  const openCuratedList = (list: CuratedList) => {
+    setActiveList(list);
+    setActiveVibe(null);
+    setResults(list.locations || []);
+  };
+
+  const closeModal = () => {
+    setActiveVibe(null);
+    setActiveList(null);
+    setResults([]);
+  };
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            tintColor={theme.accent.peach}
+            colors={[theme.accent.peach]}
+          />
+        }
+      >
         <View style={styles.header}>
           <Text style={[styles.subTitle, { color: theme.muted }]}>BERLIN · PICK YOUR MOOD</Text>
           <Text style={[styles.title, { color: theme.ink }]}>
-            What's the <Text style={styles.italic}>vibe</Text>?
+            What&apos;s the <Text style={styles.italic}>vibe</Text>?
           </Text>
           <Text style={[styles.description, { color: theme.muted }]}>
-            One tap. We'll handle the rest.
+            One tap. We&apos;ll handle the rest.
           </Text>
         </View>
+
+        {curatedLists.length > 0 && (
+          <View style={styles.guidesContainer}>
+            <Text style={[styles.guidesHeader, { color: theme.ink }]}>Curated Guides 🗺️</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.guidesScroll}
+            >
+              {curatedLists.map((list) => (
+                <TouchableOpacity
+                  key={list.id}
+                  style={[styles.guideCard, { backgroundColor: theme.surface, borderColor: theme.border }]}
+                  onPress={() => openCuratedList(list)}
+                >
+                  <View style={[styles.guideEmojiCircle, { backgroundColor: theme.accent.peach + "20" }]}>
+                    <Text style={styles.guideEmoji}>{list.emoji || "📍"}</Text>
+                  </View>
+                  <View style={styles.guideTextContainer}>
+                    <Text style={[styles.guideTitle, { color: theme.ink }]} numberOfLines={1}>{list.title}</Text>
+                    <Text style={[styles.guideDesc, { color: theme.muted }]} numberOfLines={2}>{list.description}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
 
         <View style={styles.grid}>
           {vibes.map((vibe) => (
@@ -235,29 +291,31 @@ return (
       </ScrollView>
 
       <Modal
-        visible={activeVibe !== null}
+        visible={activeVibe !== null || activeList !== null}
         animationType="slide"
         transparent={true}
-        onRequestClose={() => setActiveVibe(null)}
+        onRequestClose={closeModal}
       >
         <View style={[styles.modalOverlay, { backgroundColor: theme.overlay }]}>
           <View style={[styles.modalContent, { backgroundColor: theme.background }]}>
             <View style={[styles.modalIndicator, { backgroundColor: theme.border }]} />
 
             <View style={styles.modalHeader}>
-              <View>
+              <View style={{ flex: 1, marginRight: 16 }}>
                 <Text style={[styles.modalSubTitle, { color: theme.muted }]}>
-                  VIBE · {results.length} spot{results.length === 1 ? "" : "s"}
+                  {activeVibe ? "VIBE" : "GUIDE"} · {results.length} spot{results.length === 1 ? "" : "s"}
                 </Text>
-                <Text style={[styles.modalTitle, { color: theme.ink }]}>
-                  <Text style={{ fontSize: 24 }}>{activeVibe?.emoji}</Text>{" "}
-                  {activeVibe?.name}
+                <Text style={[styles.modalTitle, { color: theme.ink }]} numberOfLines={1}>
+                  <Text style={{ fontSize: 24 }}>{activeVibe ? activeVibe.emoji : activeList?.emoji}</Text>{" "}
+                  {activeVibe ? activeVibe.name : activeList?.title}
                 </Text>
-                <Text style={[styles.modalTagline, { color: theme.muted }]}>{activeVibe?.tagline}</Text>
+                <Text style={[styles.modalTagline, { color: theme.muted }]} numberOfLines={2}>
+                  {activeVibe ? activeVibe.tagline : activeList?.description}
+                </Text>
               </View>
               <TouchableOpacity
                 style={[styles.closeButton, { backgroundColor: theme.ink }]}
-                onPress={() => setActiveVibe(null)}
+                onPress={closeModal}
               >
                 <X size={24} color={theme.background} />
               </TouchableOpacity>
@@ -278,7 +336,7 @@ return (
                 ) : (
                   <View style={styles.emptyState}>
                     <Text style={[styles.emptyText, { color: theme.muted }]}>
-                      No spots found for this vibe yet! ✨
+                      No spots found here yet! ✨
                     </Text>
                   </View>
                 )}
@@ -317,6 +375,55 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     marginTop: 4,
+  },
+  guidesContainer: {
+    paddingTop: 10,
+    paddingBottom: 20,
+  },
+  guidesHeader: {
+    fontSize: 18,
+    fontWeight: "900",
+    paddingHorizontal: 20,
+    marginBottom: 12,
+    letterSpacing: -0.5,
+  },
+  guidesScroll: {
+    paddingHorizontal: 20,
+  },
+  guideCard: {
+    width: 280,
+    height: 110,
+    borderRadius: 24,
+    padding: 16,
+    marginRight: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 2,
+  },
+  guideEmojiCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 16,
+  },
+  guideEmoji: {
+    fontSize: 24,
+  },
+  guideTextContainer: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  guideTitle: {
+    fontSize: 16,
+    fontWeight: "900",
+    marginBottom: 4,
+  },
+  guideDesc: {
+    fontSize: 12,
+    fontWeight: "500",
+    lineHeight: 16,
   },
   grid: {
     padding: 12,

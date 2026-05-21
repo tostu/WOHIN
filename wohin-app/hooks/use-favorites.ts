@@ -1,46 +1,31 @@
-import { useState, useEffect, useCallback } from "react";
-import { api } from "@/lib/api";
+import { useCallback, useMemo } from "react";
 import { useSession } from "@/lib/auth";
+import { useFavoritesQuery, useToggleFavoriteMutation } from "@/hooks/use-queries";
 
 export function useFavorites() {
   const { data: session } = useSession();
-  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
+  const { data: favorites = [] } = useFavoritesQuery(!!session);
+  const toggleMutation = useToggleFavoriteMutation();
 
-  useEffect(() => {
-    if (!session) {
-      setFavoriteIds(new Set());
-      return;
-    }
-    api
-      .get<{ locationId: string }[]>("/api/v1/favorites")
-      .then((favs) => setFavoriteIds(new Set(favs.map((f) => f.locationId))))
-      .catch(() => {});
-  }, [session]);
+  const favoriteIds = useMemo(() => {
+    return new Set(favorites.map((f) => f.locationId));
+  }, [favorites]);
 
   const toggle = useCallback(
     async (locationId: string) => {
       if (!session) return;
-
-      setFavoriteIds((prev) => {
-        const next = new Set(prev);
-        if (next.has(locationId)) next.delete(locationId);
-        else next.add(locationId);
-        return next;
-      });
-
       try {
-        await api.post("/api/v1/favorites/toggle", { locationId });
-      } catch {
-        setFavoriteIds((prev) => {
-          const next = new Set(prev);
-          if (next.has(locationId)) next.delete(locationId);
-          else next.add(locationId);
-          return next;
-        });
+        await toggleMutation.mutateAsync(locationId);
+      } catch (err) {
+        console.error("Failed to toggle favorite:", err);
       }
     },
-    [session],
+    [session, toggleMutation],
   );
 
-  return { favoriteIds, toggle, isFavorited: (id: string) => favoriteIds.has(id) };
+  return {
+    favoriteIds,
+    toggle,
+    isFavorited: useCallback((id: string) => favoriteIds.has(id), [favoriteIds]),
+  };
 }

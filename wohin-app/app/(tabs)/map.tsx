@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -17,12 +17,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MapPin, Navigation, Locate } from "lucide-react-native";
 import { useRouter } from "expo-router";
 
-import { api } from "@/lib/api";
 import { Location as LocationModel } from "@/components/discovery/location-card";
 import { LocationCardSkeleton } from "@/components/discovery/location-card-skeleton";
 import { useLocation } from "@/hooks/use-location";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import NativeMapView from "@/components/discovery/map-view";
+import { useFeaturedLocations } from "@/hooks/use-queries";
 
 // Define a minimal interface for the map ref to avoid importing react-native-maps on web
 interface MapViewRef {
@@ -147,8 +147,6 @@ function MapCard({
 }
 
 export default function MapScreen() {
-  const [locations, setLocations] = useState<LocationModel[]>([]);
-  const [loading, setLoading] = useState(true);
   const [activeIdx, setActiveIdx] = useState(0);
   const router = useRouter();
   const { location: userLocation } = useLocation();
@@ -156,19 +154,12 @@ export default function MapScreen() {
   const mapRef = useRef<MapViewRef>(null);
   const listRef = useRef<FlatList<LocationModel>>(null);
 
-  useEffect(() => {
-    const queryParams = userLocation
-      ? `?lat=${userLocation.latitude}&lng=${userLocation.longitude}`
-      : "";
-
-    api
-      .get<{ results: LocationModel[] }>(
-        `/api/v1/discovery/featured${queryParams}${userLocation ? "&" : "?"}limit=50`,
-      )
-      .then((res) => setLocations(res.results))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [userLocation]);
+  // Fetch 50 featured locations using TanStack query hook
+  const { data: locations = [], isLoading: loading } = useFeaturedLocations(
+    userLocation?.latitude,
+    userLocation?.longitude,
+    50
+  );
 
   const withCoords = useMemo(
     () => locations.filter((l) => l.coordinates?.lat != null),

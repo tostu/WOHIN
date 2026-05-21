@@ -1,11 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { MapPin, Heart, Share2 } from 'lucide-react-native';
 import { Link } from 'expo-router';
 import { useAppTheme } from '@/hooks/use-app-theme';
 
-const { width } = Dimensions.get('window');
 
 export interface Activity {
   id: string;

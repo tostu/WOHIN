@@ -82,7 +82,7 @@ export default function SubmitScreen() {
           <Text style={styles.successEmoji}>🕊️</Text>
           <Text style={[styles.successTitle, { color: theme.ink }]}>Sent to the curators!</Text>
           <Text style={[styles.successDescription, { color: theme.muted }]}>
-            We'll review your spot and add it to the radiant map soon. Thanks for being awesome! ✨
+            {"We'll review your spot and add it to the radiant map soon. Thanks for being awesome! ✨"}
           </Text>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: theme.accent.peach }]}

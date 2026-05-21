@@ -10,6 +10,8 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { OfflineBanner } from '@/components/offline-banner';
 import { useFirstLaunch } from '@/hooks/use-first-launch';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { queryClient, asyncStoragePersister } from '@/hooks/use-queries';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -31,7 +33,7 @@ function RootLayoutNav() {
     } else if (!isFirstLaunch && inOnboardingGroup) {
       router.replace('/(tabs)');
     }
-  }, [isFirstLaunch, segments]);
+  }, [isFirstLaunch, segments, router]);
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -51,11 +53,16 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <ErrorBoundary>
-      <View style={styles.rootContainer}>
-        <View style={styles.appContainer}>
-          <RootLayoutNav />
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{ persister: asyncStoragePersister }}
+      >
+        <View style={styles.rootContainer}>
+          <View style={styles.appContainer}>
+            <RootLayoutNav />
+          </View>
         </View>
-      </View>
+      </PersistQueryClientProvider>
     </ErrorBoundary>
   );
 }

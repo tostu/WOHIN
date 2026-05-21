@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,17 +6,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
-  ActivityIndicator,
   RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { X } from "lucide-react-native";
-import { api } from "@/lib/api";
-import { LocationCard, Location } from "@/components/discovery/location-card";
+import { LocationCard } from "@/components/discovery/location-card";
 import { LocationCardSkeleton } from "@/components/discovery/location-card-skeleton";
 import { useFavorites } from "@/hooks/use-favorites";
 import { shareLocation } from "@/lib/share";
 import { useAppTheme } from "@/hooks/use-app-theme";
+import { useFeaturedLocations } from "@/hooks/use-queries";
 
 type ThemeColor = "matcha" | "peach" | "sunny";
 
@@ -125,52 +124,38 @@ const vibes: Vibe[] = [
 
 export default function DiscoverScreen() {
   const [activeVibe, setActiveVibe] = useState<Vibe | null>(null);
-  const [results, setResults] = useState<Location[]>([]);
-  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [featured, setFeatured] = useState<Location[]>([]);
   const { isFavorited, toggle: toggleFavorite } = useFavorites();
   const theme = useAppTheme();
 
-  const loadData = useCallback(async (isRefresh = false) => {
-    if (!isRefresh) setLoading(true);
-    try {
-      const res = await api.get<{ results: Location[] }>("/api/v1/discovery/featured?limit=40");
-      setFeatured(res.results);
-    } catch (e) {
-      console.error("Failed to load featured spots:", e);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
+  // Fetch 40 featured spots via TanStack Query hook
+  const {
+    data: featuredLocations = [],
+    isLoading,
+    refetch,
+  } = useFeaturedLocations(undefined, undefined, 40);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    loadData(true);
-  }, [loadData]);
+    await refetch();
+    setRefreshing(false);
+  }, [refetch]);
 
   const openVibe = (vibe: Vibe) => {
     setActiveVibe(vibe);
-    setLoading(true);
-
-    // Simple client-side filtering like in SvelteKit
-    const matches = featured.filter((loc) => {
-      const byColor = loc.activities?.some(
-        (a) => a.themeColor === vibe.themeColor,
-      );
-      const hay = (loc.name + " " + (loc.address ?? "")).toLowerCase();
-      const byKeyword = vibe.keywords.some((k) => hay.includes(k));
-      return byKeyword || byColor;
-    });
-
-    setResults(matches);
-    setLoading(false);
   };
+
+  // Derive results client-side based on the current active vibe
+  const results = activeVibe
+    ? featuredLocations.filter((loc) => {
+        const byColor = loc.activities?.some(
+          (a) => a.themeColor === activeVibe.themeColor,
+        );
+        const hay = (loc.name + " " + (loc.address ?? "")).toLowerCase();
+        const byKeyword = activeVibe.keywords.some((k) => hay.includes(k));
+        return byKeyword || byColor;
+      })
+    : [];
 return (
   <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
     <ScrollView 
@@ -187,10 +172,10 @@ return (
         <View style={styles.header}>
           <Text style={[styles.subTitle, { color: theme.muted }]}>BERLIN · PICK YOUR MOOD</Text>
           <Text style={[styles.title, { color: theme.ink }]}>
-            What's the <Text style={styles.italic}>vibe</Text>?
+            {"What's the "}<Text style={styles.italic}>vibe</Text>?
           </Text>
           <Text style={[styles.description, { color: theme.muted }]}>
-            One tap. We'll handle the rest.
+            {"One tap. We'll handle the rest."}
           </Text>
         </View>
 
@@ -263,7 +248,7 @@ return (
               </TouchableOpacity>
             </View>
 
-            {loading ? (
+            {isLoading ? (
               <ScrollView contentContainerStyle={styles.resultsScroll}>
                 <LocationCardSkeleton />
                 <LocationCardSkeleton />

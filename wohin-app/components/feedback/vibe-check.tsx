@@ -5,15 +5,14 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { api } from "@/lib/api";
 import Animated, {
   useAnimatedStyle,
   withSpring,
   withSequence,
-  withTiming,
   useSharedValue,
 } from "react-native-reanimated";
 import { useAppTheme } from "@/hooks/use-app-theme";
+import { useVibeMutation } from "@/hooks/use-queries";
 
 const vibesData = [
   { id: "sparkle", emoji: "✨", label: "Sparkle", color: "matcha" },
@@ -34,6 +33,7 @@ export function VibeCheck({
   const [currentVibe, setCurrentVibe] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const theme = useAppTheme();
+  const vibeMutation = useVibeMutation();
   
   // Animation values for each vibe
   const scales = {
@@ -41,6 +41,26 @@ export function VibeCheck({
     fire: useSharedValue(1),
     chill: useSharedValue(1),
     nope: useSharedValue(1),
+  };
+
+  const sparkleStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scales.sparkle.value }],
+  }));
+  const fireStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scales.fire.value }],
+  }));
+  const chillStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scales.chill.value }],
+  }));
+  const nopeStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scales.nope.value }],
+  }));
+
+  const animatedStyles: Record<string, any> = {
+    sparkle: sparkleStyle,
+    fire: fireStyle,
+    chill: chillStyle,
+    nope: nopeStyle,
   };
 
   const dropVibe = async (vibeId: string) => {
@@ -59,7 +79,7 @@ export function VibeCheck({
     setCurrentVibe(vibeId);
 
     try {
-      await api.post("/api/v1/feedback/vibe", {
+      await vibeMutation.mutateAsync({
         locationId,
         activityId,
         vibe: vibeId,
@@ -72,21 +92,6 @@ export function VibeCheck({
     }
   };
 
-  const getVibeStyle = (id: string, colorKey: string) => {
-    const scale = (scales as any)[id];
-    const animatedStyle = useAnimatedStyle(() => ({
-      transform: [{ scale: scale.value }],
-    }));
-
-    let backgroundColor = theme.surface;
-    if (colorKey === 'matcha') backgroundColor = theme.accent.matcha + '40';
-    else if (colorKey === 'peach') backgroundColor = theme.accent.peach + '40';
-    else if (colorKey === 'sunny') backgroundColor = theme.accent.sunny + '40';
-    else backgroundColor = theme.muted + '20';
-
-    return { animatedStyle, backgroundColor };
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -96,7 +101,13 @@ export function VibeCheck({
 
       <View style={styles.vibesGrid}>
         {vibesData.map((vibe) => {
-          const { animatedStyle, backgroundColor } = getVibeStyle(vibe.id, vibe.color);
+          const animatedStyle = animatedStyles[vibe.id];
+          let backgroundColor = theme.surface;
+          if (vibe.color === 'matcha') backgroundColor = theme.accent.matcha + '40';
+          else if (vibe.color === 'peach') backgroundColor = theme.accent.peach + '40';
+          else if (vibe.color === 'sunny') backgroundColor = theme.accent.sunny + '40';
+          else backgroundColor = theme.muted + '20';
+
           return (
             <TouchableOpacity
               key={vibe.id}

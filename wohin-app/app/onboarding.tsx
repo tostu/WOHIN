@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useFirstLaunch } from '@/hooks/use-first-launch';
@@ -7,12 +7,8 @@ import { useAppTheme } from '@/hooks/use-app-theme';
 import { Sparkles, Map, Heart, ArrowRight } from 'lucide-react-native';
 import Animated, { 
   FadeInRight, 
-  FadeOutLeft, 
-  Layout,
-  SlideInRight
+  FadeOutLeft
 } from 'react-native-reanimated';
-
-const { width } = Dimensions.get('window');
 
 const slides = [
   {

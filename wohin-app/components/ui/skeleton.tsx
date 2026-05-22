@@ -29,7 +29,7 @@ export function Skeleton({ width, height, borderRadius, style }: SkeletonProps) 
       -1,
       true
     );
-  }, []);
+  }, [opacity]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,

@@ -7,19 +7,19 @@ import {
   Modal,
   Pressable,
 } from "react-native";
-import { api } from "@/lib/api";
 import Animated, {
   useAnimatedStyle,
   withSpring,
   withSequence,
-  withTiming,
   useSharedValue,
   runOnJS,
+  withTiming,
 } from "react-native-reanimated";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import * as Haptics from "expo-haptics";
 import { useSession } from "@/lib/auth";
 import { useRouter } from "expo-router";
+import { useVibeMutation } from "@/hooks/use-queries";
 
 const vibesData = [
   { id: "sparkle", emoji: "✨", label: "Sparkle", color: "matcha" },
@@ -110,6 +110,7 @@ export function VibeCheck({
   const { data: session } = useSession();
   const router = useRouter();
   const theme = useAppTheme();
+  const vibeMutation = useVibeMutation();
   
   // Animation values for each vibe button press feedback
   const scales = {
@@ -181,7 +182,7 @@ export function VibeCheck({
     setCurrentVibe(vibeId);
 
     try {
-      await api.post("/api/v1/feedback/vibe", {
+      await vibeMutation.mutateAsync({
         locationId,
         activityId,
         vibe: vibeId,
@@ -203,7 +204,6 @@ export function VibeCheck({
 
     return backgroundColor;
   };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>

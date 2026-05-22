@@ -1,29 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { User, LogOut, Plus } from "lucide-react-native";
 import { useSession, signOut } from "@/lib/auth";
 import { Link } from "expo-router";
-import { api } from "@/lib/api";
 import { useAppTheme } from "@/hooks/use-app-theme";
+import { useUserVibes } from "@/hooks/use-queries";
 
 export default function ProfileScreen() {
   const { data: session, isPending } = useSession();
-  const [vibeCount, setVibeCount] = useState(0);
-  const [spotCount, setSpotCount] = useState(0);
   const theme = useAppTheme();
 
-  useEffect(() => {
-    if (!session) return;
-    api
-      .get<any[]>("/api/v1/feedback/me")
-      .then((vibes) => {
-        setVibeCount(vibes.length);
-        const uniqueLocations = new Set(vibes.map((v: any) => v.locationId));
-        setSpotCount(uniqueLocations.size);
-      })
-      .catch(() => {});
-  }, [session]);
+  // Load user vibes via TanStack Query hook
+  const { data: vibes = [] } = useUserVibes(!!session);
+
+  const vibeCount = vibes.length;
+  const spotCount = new Set(vibes.map((v: any) => v.locationId)).size;
 
   if (isPending) {
     return <View style={[styles.container, { backgroundColor: theme.background }]} />;

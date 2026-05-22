@@ -1,61 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Share } from 'react-native';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, Stack } from 'expo-router';
-import { api } from '@/lib/api';
 import { VibeCheck } from '@/components/feedback/vibe-check';
-import { Location } from '@/components/discovery/location-card';
 import { PortableText } from '@/components/portable-text';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Share } from 'react-native';
 import { Share2 } from 'lucide-react-native';
 import { useAppTheme } from '@/hooks/use-app-theme';
+import { useLocationDetail, useVibeHistory } from '@/hooks/use-queries';
 
 export default function LocationDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
-  const [location, setLocation] = useState<Location | null>(null);
-  const [vibeHistory, setVibeHistory] = useState<any[]>([]);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const theme = useAppTheme();
 
+  // Load location detail and vibe history via queries
+  const { data: location, isLoading: isLoadingLocation } = useLocationDetail(slug);
+  const { data: vibeHistory = [] } = useVibeHistory(location?.id ?? "");
+
   useEffect(() => {
-    async function loadData() {
-      try {
-        const loc = await api.get<Location>(`/api/v1/discovery/location/${slug}`);
-        setLocation(loc);
-
-        if (loc.activities.length > 0) {
-          setSelectedActivityId(loc.activities[0].id);
-        }
-
-        const history = await api.get<any[]>(`/api/v1/feedback/location/${loc.id}`);
-        setVibeHistory(history);
-      } catch (e) {
-        console.error('Failed to load location:', e);
-      } finally {
-        setLoading(false);
+    if (location && location.activities.length > 0) {
+      const hasActivity = location.activities.some(a => a.id === selectedActivityId);
+      if (!hasActivity) {
+        setSelectedActivityId(location.activities[0].id);
       }
     }
-
-    loadData();
-  }, [slug]);
-
-  const handleVibe = (vibe: string) => {
-    const newVibe = {
-      id: Math.random().toString(),
-      vibe: vibe,
-      createdAt: new Date().toISOString()
-    };
-    setVibeHistory(prev => [newVibe, ...prev]);
-  };
+  }, [location, slug, selectedActivityId]);
 
   const vibeCounts = vibeHistory.reduce((acc: any, v) => {
     acc[v.vibe] = (acc[v.vibe] || 0) + 1;
     return acc;
   }, { sparkle: 0, fire: 0, chill: 0, nope: 0 });
 
-  if (loading) {
+  if (isLoadingLocation) {
     return (
       <View style={[styles.container, { backgroundColor: theme.background }]}>
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -151,7 +128,7 @@ export default function LocationDetailScreen() {
               <VibeCheck
                 locationId={location.id}
                 activityId={selectedActivityId}
-                onVibe={handleVibe}
+                onVibe={() => {}}
               />
             </View>
           )}

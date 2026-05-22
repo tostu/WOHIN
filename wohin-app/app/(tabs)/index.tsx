@@ -1,22 +1,18 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   TextInput,
   RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Search, X } from "lucide-react-native";
-import { api } from "@/lib/api";
 import {
   LocationCard,
-  Location,
-  Activity,
   FeedbackStack,
 } from "@/components/discovery/location-card";
 import { LocationCardSkeleton } from "@/components/discovery/location-card-skeleton";
@@ -25,119 +21,86 @@ import { Link } from "expo-router";
 import { useFavorites } from "@/hooks/use-favorites";
 import { shareLocation } from "@/lib/share";
 import { useLocation } from "@/hooks/use-location";
+import {
+  useActivities,
+  useFeaturedLocations,
+  useSearchLocations,
+  useActivityFilteredLocations,
+} from "@/hooks/use-queries";
 
 export default function HomeScreen() {
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [newArrivals, setNewArrivals] = useState<Location[]>([]);
-  const [trendingSpots, setTrendingSpots] = useState<Location[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<Location[] | null>(null);
-  const [searching, setSearching] = useState(false);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
-  const [filteredLocations, setFilteredLocations] = useState<Location[]>([]);
-  const [filtering, setFiltering] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   
   const theme = useAppTheme();
   const { isFavorited, toggle: toggleFavorite } = useFavorites();
   const { location: userLocation } = useLocation();
 
-  const loadData = useCallback(async (isRefresh = false) => {
-    if (!isRefresh) setLoading(true);
-    setError(null);
-    try {
-      const queryParams = userLocation 
-        ? `?lat=${userLocation.latitude}&lng=${userLocation.longitude}`
-        : "";
+  // Queries
+  const { 
+    data: activities = [], 
+    isLoading: isLoadingActivities, 
+    error: activitiesError, 
+    refetch: refetchActivities 
+  } = useActivities();
 
-      const [activitiesRes, featuredRes] = await Promise.all([
-        api.get<{ activities: Activity[] }>("/api/v1/discovery/activities"),
-        api.get<{ results: Location[] }>(
-          `/api/v1/discovery/featured${queryParams}${userLocation ? "&" : "?"}limit=10`,
-        ),
-      ]);
+  const { 
+    data: featuredLocations = [], 
+    isLoading: isLoadingFeatured, 
+    error: featuredError, 
+    refetch: refetchFeatured 
+  } = useFeaturedLocations(
+    userLocation?.latitude,
+    userLocation?.longitude,
+    10
+  );
 
-      setActivities(activitiesRes.activities);
-      setNewArrivals(featuredRes.results.slice(0, 3));
-      setTrendingSpots(featuredRes.results.slice(3, 7));
-      
-      // Reset filtering state on full load/refresh
-      setSelectedActivityId(null);
-      setSearchResults(null);
-      setSearchQuery("");
-    } catch (e) {
-      console.error("Failed to load home data:", e);
-      setError("Unable to reach the magic. Check your connection!");
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [userLocation]);
+  const { 
+    data: searchResults, 
+    isFetching: searching 
+  } = useSearchLocations(
+    searchQuery,
+    userLocation?.latitude,
+    userLocation?.longitude
+  );
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  const { 
+    data: filteredLocations, 
+    isFetching: filtering 
+  } = useActivityFilteredLocations(
+    selectedActivityId,
+    userLocation?.latitude,
+    userLocation?.longitude
+  );
 
-  const onRefresh = useCallback(() => {
+  const isLoadingInitial = isLoadingActivities || isLoadingFeatured;
+  const hasError = (activitiesError || featuredError) && !activities.length;
+
+  const newArrivals = featuredLocations.slice(0, 3);
+  const trendingSpots = featuredLocations.slice(3, 7);
+
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    loadData(true);
-  }, [loadData]);
+    await Promise.all([
+      refetchActivities(),
+      refetchFeatured(),
+    ]);
+    setRefreshing(false);
+  }, [refetchActivities, refetchFeatured]);
 
-  const handleActivityPress = async (activityId: string | null) => {
+  const handleActivityPress = (activityId: string | null) => {
     setSelectedActivityId(activityId);
     setSearchQuery("");
-    setSearchResults(null);
-    
-    if (activityId === null) {
-      setFilteredLocations([]);
-      return;
-    }
-
-    setFiltering(true);
-    try {
-      const queryParams = userLocation 
-        ? `&lat=${userLocation.latitude}&lng=${userLocation.longitude}`
-        : "";
-      const res = await api.get<{ results: Location[] }>(
-        `/api/v1/discovery/search?activityId=${activityId}${queryParams}`,
-      );
-      setFilteredLocations(res.results);
-    } catch (e) {
-      console.error("Failed to filter by activity:", e);
-      setFilteredLocations([]);
-    } finally {
-      setFiltering(false);
-    }
   };
 
-  const handleSearch = useCallback(async (query: string) => {
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
-    setSelectedActivityId(null); // Clear activity filter when searching
-    if (!query.trim()) {
-      setSearchResults(null);
-      return;
-    }
-    setSearching(true);
-    try {
-      const queryParams = userLocation 
-        ? `&lat=${userLocation.latitude}&lng=${userLocation.longitude}`
-        : "";
-      const res = await api.get<{ results: Location[] }>(
-        `/api/v1/discovery/search?q=${encodeURIComponent(query.trim())}${queryParams}`,
-      );
-      setSearchResults(res.results);
-    } catch {
-      setSearchResults([]);
-    } finally {
-      setSearching(false);
-    }
-  }, [userLocation]);
+    setSelectedActivityId(null);
+  }, []);
 
   const clearSearch = () => {
     setSearchQuery("");
-    setSearchResults(null);
   };
 
   const getActivityColor = (themeName?: string) => {
@@ -153,7 +116,7 @@ export default function HomeScreen() {
     }
   };
 
-  if (loading) {
+  if (isLoadingInitial) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={["top"]}>
         <View style={styles.header}>
@@ -171,16 +134,21 @@ export default function HomeScreen() {
     );
   }
 
-  if (error && !activities.length) {
+  if (hasError) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={["top"]}>
         <View style={styles.errorContainer}>
           <Text style={styles.errorEmoji}>⚡</Text>
           <Text style={[styles.errorTitle, { color: theme.ink }]}>Signal Lost</Text>
-          <Text style={[styles.errorText, { color: theme.muted }]}>{error}</Text>
+          <Text style={[styles.errorText, { color: theme.muted }]}>
+            Unable to reach the magic. Check your connection!
+          </Text>
           <TouchableOpacity 
             style={[styles.retryButton, { backgroundColor: theme.accent.peach }]} 
-            onPress={() => loadData()}
+            onPress={() => {
+              refetchActivities();
+              refetchFeatured();
+            }}
           >
             <Text style={styles.retryText}>Try Again</Text>
           </TouchableOpacity>
@@ -231,15 +199,15 @@ export default function HomeScreen() {
         </View>
 
         {/* Search or Filter Results */}
-        {(searchResults !== null || selectedActivityId !== null) ? (
+        {(searchQuery.trim().length > 0 || selectedActivityId !== null) ? (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={[styles.sectionTitle, { color: theme.ink }]}>
                 {searching || filtering
                   ? "Loading..."
                   : selectedActivityId 
-                    ? `${filteredLocations.length} result${filteredLocations.length !== 1 ? "s" : ""} for ${activities.find(a => a.id === selectedActivityId)?.name}`
-                    : `${searchResults!.length} result${searchResults!.length !== 1 ? "s" : ""}`}
+                    ? `${filteredLocations?.length ?? 0} result${filteredLocations?.length !== 1 ? "s" : ""} for ${activities.find(a => a.id === selectedActivityId)?.name}`
+                    : `${searchResults?.length ?? 0} result${searchResults?.length !== 1 ? "s" : ""}`}
               </Text>
             </View>
             {searching || filtering ? (
@@ -247,8 +215,8 @@ export default function HomeScreen() {
                 <LocationCardSkeleton />
                 <LocationCardSkeleton />
               </View>
-            ) : (selectedActivityId ? filteredLocations : searchResults!).length > 0 ? (
-              (selectedActivityId ? filteredLocations : searchResults!).map((location) => (
+            ) : (selectedActivityId ? (filteredLocations ?? []) : (searchResults ?? [])).length > 0 ? (
+              (selectedActivityId ? (filteredLocations ?? []) : (searchResults ?? [])).map((location) => (
                 <LocationCard key={location.id} location={location} isFavorited={isFavorited(location.id)} onFavorite={toggleFavorite} onShare={shareLocation} />
               ))
             ) : (

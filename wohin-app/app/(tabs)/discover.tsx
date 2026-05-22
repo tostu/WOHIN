@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,17 +6,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
-  ActivityIndicator,
   RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { X } from "lucide-react-native";
-import { api } from "@/lib/api";
-import { LocationCard, Location } from "@/components/discovery/location-card";
+import { LocationCard } from "@/components/discovery/location-card";
 import { LocationCardSkeleton } from "@/components/discovery/location-card-skeleton";
 import { useFavorites } from "@/hooks/use-favorites";
 import { shareLocation } from "@/lib/share";
 import { useAppTheme } from "@/hooks/use-app-theme";
+import { useFeaturedLocations, useCuratedLists, CuratedList } from "@/hooks/use-queries";
 
 type ThemeColor = "matcha" | "peach" | "sunny";
 
@@ -30,15 +29,6 @@ interface Vibe {
   area: string;
   bg: [string, string]; // simplified gradient colors
   ink: "light" | "dark";
-}
-
-interface CuratedList {
-  id: string;
-  title: string;
-  slug: string;
-  emoji?: string;
-  description?: string;
-  locations: Location[];
 }
 
 const vibes: Vibe[] = [
@@ -135,70 +125,60 @@ const vibes: Vibe[] = [
 export default function DiscoverScreen() {
   const [activeVibe, setActiveVibe] = useState<Vibe | null>(null);
   const [activeList, setActiveList] = useState<CuratedList | null>(null);
-  const [results, setResults] = useState<Location[]>([]);
-  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [featured, setFeatured] = useState<Location[]>([]);
-  const [curatedLists, setCuratedLists] = useState<CuratedList[]>([]);
   const { isFavorited, toggle: toggleFavorite } = useFavorites();
   const theme = useAppTheme();
 
-  const loadData = useCallback(async (isRefresh = false) => {
-    if (!isRefresh) setLoading(true);
-    try {
-      const [featuredRes, listsRes] = await Promise.all([
-        api.get<{ results: Location[] }>("/api/v1/discovery/featured?limit=40"),
-        api.get<{ results: CuratedList[] }>("/api/v1/discovery/lists")
-      ]);
-      setFeatured(featuredRes.results || []);
-      setCuratedLists(listsRes.results || []);
-    } catch (e) {
-      console.error("Failed to load featured spots & curated lists:", e);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
+  // Fetch 40 featured spots via TanStack Query hook
+  const {
+    data: featuredLocations = [],
+    isLoading: isLoadingFeatured,
+    refetch: refetchFeatured,
+  } = useFeaturedLocations(undefined, undefined, 40);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  // Fetch curated lists via TanStack Query hook
+  const {
+    data: curatedLists = [],
+    isLoading: isLoadingLists,
+    refetch: refetchLists,
+  } = useCuratedLists();
 
-  const onRefresh = useCallback(() => {
+  const isLoading = isLoadingFeatured || isLoadingLists;
+
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    loadData(true);
-  }, [loadData]);
+    await Promise.all([refetchFeatured(), refetchLists()]);
+    setRefreshing(false);
+  }, [refetchFeatured, refetchLists]);
 
   const openVibe = (vibe: Vibe) => {
     setActiveVibe(vibe);
     setActiveList(null);
-    setLoading(true);
-
-    // Simple client-side filtering like in SvelteKit
-    const matches = featured.filter((loc) => {
-      const byColor = loc.activities?.some(
-        (a) => a.themeColor === vibe.themeColor,
-      );
-      const hay = (loc.name + " " + (loc.address ?? "")).toLowerCase();
-      const byKeyword = vibe.keywords.some((k) => hay.includes(k));
-      return byKeyword || byColor;
-    });
-
-    setResults(matches);
-    setLoading(false);
   };
 
   const openCuratedList = (list: CuratedList) => {
     setActiveList(list);
     setActiveVibe(null);
-    setResults(list.locations || []);
   };
 
   const closeModal = () => {
     setActiveVibe(null);
     setActiveList(null);
-    setResults([]);
   };
+
+  // Derive results client-side based on the current active vibe or active curated list
+  const results = activeVibe
+    ? featuredLocations.filter((loc) => {
+        const byColor = loc.activities?.some(
+          (a) => a.themeColor === activeVibe.themeColor,
+        );
+        const hay = (loc.name + " " + (loc.address ?? "")).toLowerCase();
+        const byKeyword = activeVibe.keywords.some((k) => hay.includes(k));
+        return byKeyword || byColor;
+      })
+    : activeList
+    ? activeList.locations || []
+    : [];
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
@@ -216,10 +196,10 @@ export default function DiscoverScreen() {
         <View style={styles.header}>
           <Text style={[styles.subTitle, { color: theme.muted }]}>BERLIN · PICK YOUR MOOD</Text>
           <Text style={[styles.title, { color: theme.ink }]}>
-            What&apos;s the <Text style={styles.italic}>vibe</Text>?
+            {"What's the "}<Text style={styles.italic}>vibe</Text>?
           </Text>
           <Text style={[styles.description, { color: theme.muted }]}>
-            One tap. We&apos;ll handle the rest.
+            {"One tap. We'll handle the rest."}
           </Text>
         </View>
 
@@ -321,7 +301,7 @@ export default function DiscoverScreen() {
               </TouchableOpacity>
             </View>
 
-            {loading ? (
+            {isLoading ? (
               <ScrollView contentContainerStyle={styles.resultsScroll}>
                 <LocationCardSkeleton />
                 <LocationCardSkeleton />

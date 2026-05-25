@@ -18,20 +18,28 @@ export default function ProfileScreen() {
   const spotCount = new Set(vibes.map((v: any) => v.locationId)).size;
 
   if (isPending) {
-    return <View style={[styles.container, { backgroundColor: theme.background }]} />;
+    return (
+      <View style={StyleSheet.flatten([styles.container, { backgroundColor: theme.background }])} />
+    );
   }
 
   if (!session) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <SafeAreaView
+        style={StyleSheet.flatten([styles.container, { backgroundColor: theme.background }])}
+      >
         <View style={styles.content}>
           <User size={64} color={theme.accent.peach} />
-          <Text style={[styles.title, { color: theme.ink }]}>Join the Community</Text>
-          <Text style={[styles.description, { color: theme.muted }]}>
+          <Text style={StyleSheet.flatten([styles.title, { color: theme.ink }])}>
+            Join the Community
+          </Text>
+          <Text style={StyleSheet.flatten([styles.description, { color: theme.muted }])}>
             Sign in to drop vibes and share your favorite spots!
           </Text>
           <Link href="/login" asChild>
-            <TouchableOpacity style={[styles.button, { backgroundColor: theme.accent.peach }]}>
+            <TouchableOpacity
+              style={StyleSheet.flatten([styles.button, { backgroundColor: theme.accent.peach }])}
+            >
               <Text style={styles.buttonText}>Sign In</Text>
             </TouchableOpacity>
           </Link>
@@ -41,41 +49,74 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+    <SafeAreaView
+      style={StyleSheet.flatten([styles.container, { backgroundColor: theme.background }])}
+    >
       <View style={styles.header}>
-        <View style={[styles.avatar, { backgroundColor: theme.accent.peach }]}>
+        <View style={StyleSheet.flatten([styles.avatar, { backgroundColor: theme.accent.peach }])}>
           <Text style={styles.avatarText}>{session.user.name?.[0] || "U"}</Text>
         </View>
-        <Text style={[styles.userName, { color: theme.ink }]}>{session.user.name}</Text>
-        <Text style={[styles.userEmail, { color: theme.muted }]}>{session.user.email}</Text>
+        <Text style={StyleSheet.flatten([styles.userName, { color: theme.ink }])}>
+          {session.user.name}
+        </Text>
+        <Text style={StyleSheet.flatten([styles.userEmail, { color: theme.muted }])}>
+          {session.user.email}
+        </Text>
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.ink }]}>Stats</Text>
+        <Text style={StyleSheet.flatten([styles.sectionTitle, { color: theme.ink }])}>Stats</Text>
         <View style={styles.statsRow}>
-          <View style={[styles.statBox, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
-            <Text style={[styles.statValue, { color: theme.ink }]}>{vibeCount}</Text>
-            <Text style={[styles.statLabel, { color: theme.muted }]}>Vibes</Text>
+          <View
+            style={StyleSheet.flatten([
+              styles.statBox,
+              { backgroundColor: theme.surface, shadowColor: theme.shadow },
+            ])}
+          >
+            <Text style={StyleSheet.flatten([styles.statValue, { color: theme.ink }])}>
+              {vibeCount}
+            </Text>
+            <Text style={StyleSheet.flatten([styles.statLabel, { color: theme.muted }])}>
+              Vibes
+            </Text>
           </View>
-          <View style={[styles.statBox, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
-            <Text style={[styles.statValue, { color: theme.ink }]}>{spotCount}</Text>
-            <Text style={[styles.statLabel, { color: theme.muted }]}>Spots</Text>
+          <View
+            style={StyleSheet.flatten([
+              styles.statBox,
+              { backgroundColor: theme.surface, shadowColor: theme.shadow },
+            ])}
+          >
+            <Text style={StyleSheet.flatten([styles.statValue, { color: theme.ink }])}>
+              {spotCount}
+            </Text>
+            <Text style={StyleSheet.flatten([styles.statLabel, { color: theme.muted }])}>
+              Spots
+            </Text>
           </View>
         </View>
       </View>
 
       <View style={styles.actionsSection}>
         <Link href="/submit" asChild>
-          <TouchableOpacity style={[styles.submitButton, { backgroundColor: theme.accent.matcha }]}>
+          <TouchableOpacity
+            style={StyleSheet.flatten([
+              styles.submitButton,
+              { backgroundColor: theme.accent.matcha },
+            ])}
+          >
             <Plus size={20} color={theme.ink} />
-            <Text style={[styles.submitButtonText, { color: theme.ink }]}>Submit a Spot</Text>
+            <Text style={StyleSheet.flatten([styles.submitButtonText, { color: theme.ink }])}>
+              Submit a Spot
+            </Text>
           </TouchableOpacity>
         </Link>
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={() => signOut()}>
         <LogOut size={20} color={theme.accent.peach} />
-        <Text style={[styles.logoutText, { color: theme.accent.peach }]}>Sign Out</Text>
+        <Text style={StyleSheet.flatten([styles.logoutText, { color: theme.accent.peach }])}>
+          Sign Out
+        </Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -117,18 +158,44 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 40,
   },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+  avatarAura: {
+    width: 116,
+    height: 116,
+    borderRadius: 58,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  avatar: {
+    width: 108,
+    height: 108,
+    borderRadius: 54,
+    alignItems: "center",
+    justifyContent: "center",
   },
   avatarText: {
-    fontSize: 40,
+    fontSize: 48,
     fontWeight: "900",
-    color: "#fff",
+  },
+  titleBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    marginBottom: 12,
+    gap: 6,
+  },
+  titleText: {
+    fontSize: 12,
+    fontWeight: "800",
+    letterSpacing: 0.5,
   },
   userName: {
     fontSize: 24,

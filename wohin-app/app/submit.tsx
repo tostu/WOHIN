@@ -22,7 +22,7 @@ export default function SubmitScreen() {
 
   if (isPending) {
     return (
-      <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <View style={StyleSheet.flatten([styles.container, { backgroundColor: theme.background }])}>
         <ActivityIndicator size="large" color={theme.accent.peach} />
       </View>
     );
@@ -30,14 +30,14 @@ export default function SubmitScreen() {
 
   if (!session) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <SafeAreaView style={StyleSheet.flatten([styles.container, { backgroundColor: theme.background }])}>
         <View style={styles.successContent}>
           <Text style={styles.successEmoji}>🔒</Text>
-          <Text style={[styles.successTitle, { color: theme.ink }]}>Sign in first</Text>
-          <Text style={[styles.successDescription, { color: theme.muted }]}>
+          <Text style={StyleSheet.flatten([styles.successTitle, { color: theme.ink }])}>Sign in first</Text>
+          <Text style={StyleSheet.flatten([styles.successDescription, { color: theme.muted }])}>
             You need to be signed in to submit a spot.
           </Text>
-          <TouchableOpacity style={[styles.button, { backgroundColor: theme.accent.peach }]} onPress={() => router.push('/login')}>
+          <TouchableOpacity style={StyleSheet.flatten([styles.button, { backgroundColor: theme.accent.peach }])} onPress={() => router.push('/login')}>
             <Text style={styles.buttonText}>Sign In</Text>
           </TouchableOpacity>
         </View>
@@ -77,15 +77,15 @@ export default function SubmitScreen() {
 
   if (submitted) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <SafeAreaView style={StyleSheet.flatten([styles.container, { backgroundColor: theme.background }])}>
         <View style={styles.successContent}>
           <Text style={styles.successEmoji}>🕊️</Text>
-          <Text style={[styles.successTitle, { color: theme.ink }]}>Sent to the curators!</Text>
-          <Text style={[styles.successDescription, { color: theme.muted }]}>
+          <Text style={StyleSheet.flatten([styles.successTitle, { color: theme.ink }])}>Sent to the curators!</Text>
+          <Text style={StyleSheet.flatten([styles.successDescription, { color: theme.muted }])}>
             {"We'll review your spot and add it to the radiant map soon. Thanks for being awesome! ✨"}
           </Text>
           <TouchableOpacity
-            style={[styles.button, { backgroundColor: theme.accent.peach }]}
+            style={StyleSheet.flatten([styles.button, { backgroundColor: theme.accent.peach }])}
             onPress={() => {
               setSubmitted(false);
               setName('');
@@ -101,24 +101,24 @@ export default function SubmitScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+    <SafeAreaView style={StyleSheet.flatten([styles.container, { backgroundColor: theme.background }])}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={[styles.title, { color: theme.ink }]}>
+          <Text style={StyleSheet.flatten([styles.title, { color: theme.ink }])}>
             Share a {'\n'}
-            <Text style={[styles.italic, { color: theme.accent.matcha }]}>new</Text> {'\n'}
+            <Text style={StyleSheet.flatten([styles.italic, { color: theme.accent.matcha }])}>new</Text> {'\n'}
             discovery.
           </Text>
-          <Text style={[styles.subTitle, { color: theme.muted }]}>
+          <Text style={StyleSheet.flatten([styles.subTitle, { color: theme.muted }])}>
             Help the community grow by adding your favorite radiant spots.
           </Text>
         </View>
 
-        <View style={[styles.form, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
+        <View style={StyleSheet.flatten([styles.form, { backgroundColor: theme.surface, shadowColor: theme.shadow }])}>
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: theme.muted }]}>SPOT NAME</Text>
+            <Text style={StyleSheet.flatten([styles.label, { color: theme.muted }])}>SPOT NAME</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.background, color: theme.ink }]}
+              style={StyleSheet.flatten([styles.input, { backgroundColor: theme.background, color: theme.ink }])}
               placeholder="e.g., The Cozy Corner"
               placeholderTextColor={theme.muted}
               value={name}
@@ -127,37 +127,37 @@ export default function SubmitScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: theme.muted }]}>WHERE IS IT?</Text>
+            <Text style={StyleSheet.flatten([styles.label, { color: theme.muted }])}>WHERE IS IT?</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.background, color: theme.ink }]}
+              style={StyleSheet.flatten([styles.input, { backgroundColor: theme.background, color: theme.ink }])}
               placeholder="Street, City"
               placeholderTextColor={theme.muted}
               value={address}
               onChangeText={setAddress}
             />
             <TouchableOpacity 
-              style={[
+              style={StyleSheet.flatten([
                 styles.locationButton, 
                 { borderColor: theme.accent.peach },
                 coordinates ? { backgroundColor: theme.accent.peach } : { backgroundColor: theme.accent.peach + '15' }
-              ]} 
+              ])} 
               onPress={handleSetCurrentLocation}
             >
               <MapPin size={16} color={coordinates ? "#fff" : theme.accent.peach} />
-              <Text style={[
+              <Text style={StyleSheet.flatten([
                 styles.locationButtonText, 
                 { color: theme.accent.peach },
                 coordinates && { color: "#fff" }
-              ]}>
+              ])}>
                 {coordinates ? "Location Captured! ✨" : "Use my current location"}
               </Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: theme.muted }]}>THE VIBE</Text>
+            <Text style={StyleSheet.flatten([styles.label, { color: theme.muted }])}>THE VIBE</Text>
             <TextInput
-              style={[styles.input, styles.textArea, { backgroundColor: theme.background, color: theme.ink }]}
+              style={StyleSheet.flatten([styles.input, styles.textArea, { backgroundColor: theme.background, color: theme.ink }])}
               placeholder="Tell us why it's cool! ✨"
               placeholderTextColor={theme.muted}
               value={description}
@@ -168,7 +168,7 @@ export default function SubmitScreen() {
           </View>
 
           <TouchableOpacity
-            style={[styles.button, { backgroundColor: theme.accent.peach }]}
+            style={StyleSheet.flatten([styles.button, { backgroundColor: theme.accent.peach }])}
             onPress={handleSubmit}
             disabled={loading || !name}
           >

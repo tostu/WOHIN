@@ -33,17 +33,17 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+    <SafeAreaView style={StyleSheet.flatten([styles.container, { backgroundColor: theme.background }])}>
       <View style={styles.content}>
-        <Text style={[styles.title, { color: theme.ink }]}>{isSignUp ? 'Create Account' : 'Welcome Back'}</Text>
-        <Text style={[styles.subTitle, { color: theme.muted }]}>Discover the best vibes in town.</Text>
+        <Text style={StyleSheet.flatten([styles.title, { color: theme.ink }])}>{isSignUp ? 'Create Account' : 'Welcome Back'}</Text>
+        <Text style={StyleSheet.flatten([styles.subTitle, { color: theme.muted }])}>Discover the best vibes in town.</Text>
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <View style={styles.form}>
           {isSignUp && (
             <TextInput
-              style={[styles.input, { backgroundColor: theme.surface, color: theme.ink, borderColor: theme.border }]}
+              style={StyleSheet.flatten([styles.input, { backgroundColor: theme.surface, color: theme.ink, borderColor: theme.border }])}
               placeholder="Name"
               placeholderTextColor={theme.muted}
               value={name}
@@ -52,7 +52,7 @@ export default function LoginScreen() {
             />
           )}
           <TextInput
-            style={[styles.input, { backgroundColor: theme.surface, color: theme.ink, borderColor: theme.border }]}
+            style={StyleSheet.flatten([styles.input, { backgroundColor: theme.surface, color: theme.ink, borderColor: theme.border }])}
             placeholder="Email"
             placeholderTextColor={theme.muted}
             value={email}
@@ -61,7 +61,7 @@ export default function LoginScreen() {
             keyboardType="email-address"
           />
           <TextInput
-            style={[styles.input, { backgroundColor: theme.surface, color: theme.ink, borderColor: theme.border }]}
+            style={StyleSheet.flatten([styles.input, { backgroundColor: theme.surface, color: theme.ink, borderColor: theme.border }])}
             placeholder="Password"
             placeholderTextColor={theme.muted}
             value={password}
@@ -70,7 +70,7 @@ export default function LoginScreen() {
           />
 
           <TouchableOpacity
-            style={[styles.button, { backgroundColor: theme.accent.peach }]}
+            style={StyleSheet.flatten([styles.button, { backgroundColor: theme.accent.peach }])}
             onPress={handleAuth}
             disabled={loading}
           >
@@ -85,7 +85,7 @@ export default function LoginScreen() {
             style={styles.toggleButton}
             onPress={() => setIsSignUp(!isSignUp)}
           >
-            <Text style={[styles.toggleText, { color: theme.muted }]}>
+            <Text style={StyleSheet.flatten([styles.toggleText, { color: theme.muted }])}>
               {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
             </Text>
           </TouchableOpacity>

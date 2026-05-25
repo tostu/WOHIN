@@ -1,3 +1,19 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+@import "nativewind/theme";
+
+@theme {
+  --color-background: #fefcf4;
+  --color-surface: #ffffff;
+  --color-ink: #2c2b29;
+  --color-muted: #8b8a87;
+  --color-accent-peach: #ffb7b2;
+  --color-accent-matcha: #a8e6cf;
+  --color-accent-sunny: #ffd97d;
+}
+
 :root {
   --background: #fefcf4;
   --surface: #ffffff;

@@ -13,8 +13,8 @@ interface MapViewProps {
 
 export default function NativeMapView({ theme }: MapViewProps) {
   return (
-    <View style={[styles.container, { backgroundColor: theme?.background || "#f0f0f0" }]}>
-      <Text style={[styles.text, { color: theme?.muted || "#666" }]}>
+    <View style={StyleSheet.flatten([styles.container, { backgroundColor: theme?.background || "#f0f0f0" }])}>
+      <Text style={StyleSheet.flatten([styles.text, { color: theme?.muted || "#666" }])}>
         Map view is not available on web.
       </Text>
     </View>

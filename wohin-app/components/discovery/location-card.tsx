@@ -65,14 +65,14 @@ export function FeedbackStack({ vibeCounts }: { vibeCounts?: VibeCounts }) {
       {active.map(([key], i) => (
         <View
           key={key}
-          style={[styles.emojiCircle, { zIndex: 10 - i, marginLeft: i === 0 ? 0 : -8, borderColor: theme.surface, backgroundColor: theme.accent.peach + '40' }]}
+          style={StyleSheet.flatten([styles.emojiCircle, { zIndex: 10 - i, marginLeft: i === 0 ? 0 : -8, borderColor: theme.surface, backgroundColor: theme.accent.peach + '40' }])}
         >
           <Text style={styles.emojiText}>{vibeEmojiMap[key]}</Text>
         </View>
       ))}
       {total > 3 && (
-        <View style={[styles.countCircle, { marginLeft: -8, borderColor: theme.surface, backgroundColor: theme.accent.sunny + '60' }]}>
-          <Text style={[styles.countText, { color: theme.ink }]}>+{total}</Text>
+        <View style={StyleSheet.flatten([styles.countCircle, { marginLeft: -8, borderColor: theme.surface, backgroundColor: theme.accent.sunny + '60' }])}>
+          <Text style={StyleSheet.flatten([styles.countText, { color: theme.ink }])}>+{total}</Text>
         </View>
       )}
     </View>
@@ -100,63 +100,64 @@ export function LocationCard({ location, isFavorited, onFavorite, onShare }: Loc
 
   return (
     <Link href={`/location/${location.slug}`} asChild>
-      <TouchableOpacity activeOpacity={0.9} style={styles.container}>
-        <View style={[styles.card, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
-          <View style={styles.imageContainer}>
+      <TouchableOpacity activeOpacity={0.9} className="mb-6 px-5">
+        <View className="rounded-[32px] p-4 flex-row shadow-lg" style={{ backgroundColor: theme.surface, shadowColor: theme.shadow }}>
+          <View className="w-[120px] h-[120px] rounded-3xl overflow-hidden relative">
             {location.image || (location.photos && location.photos[0]) ? (
               <Image
                 source={location.image || location.photos?.[0]}
-                style={styles.image}
+                className="w-full h-full"
                 contentFit="cover"
                 transition={200}
               />
             ) : (
-              <View style={[styles.imagePlaceholder, { backgroundColor: themeColor + '40' }]}>
+              <View className="w-full h-full items-center justify-center" style={{ backgroundColor: themeColor + '40' }}>
                 <MapPin size={48} color={themeColor} />
               </View>
             )}
 
             {primaryActivity && (
-              <View style={[styles.vibeTag, { backgroundColor: themeColor }]}>
-                <Text style={[styles.vibeTagText, { color: theme.ink }]}>{primaryActivity.name.toUpperCase()}</Text>
+              <View className="absolute bottom-2 left-2 px-2 py-1 rounded-xl shadow-md" style={{ backgroundColor: themeColor }}>
+                <Text className="text-[8px] font-black tracking-widest" style={{ color: theme.ink }}>{primaryActivity.name.toUpperCase()}</Text>
               </View>
             )}
           </View>
 
-          <View style={styles.content}>
-            <View style={styles.header}>
-              <Text style={[styles.title, { color: theme.ink }]} numberOfLines={1}>{location.name}</Text>
+          <View className="flex-1 ml-4 justify-center">
+            <View className="flex-row justify-between items-start mb-1">
+              <Text className="text-lg font-black flex-1 mr-2" style={{ color: theme.ink }} numberOfLines={1}>{location.name}</Text>
               {location.rating != null && (
-                <View style={[styles.ratingBadge, { backgroundColor: theme.accent.sunny + '40' }]}>
-                  <Text style={[styles.ratingText, { color: theme.ink }]}>⭐ {location.rating.toFixed(1)}</Text>
+                <View className="px-1.5 py-0.5 rounded-xl" style={{ backgroundColor: theme.accent.sunny + '40' }}>
+                  <Text className="text-[10px] font-black" style={{ color: theme.ink }}>⭐ {location.rating.toFixed(1)}</Text>
                 </View>
               )}
             </View>
 
-            <View style={styles.addressContainer}>
+            <View className="flex-row items-center mb-3">
               <MapPin size={12} color={theme.muted} />
-              <Text style={[styles.address, { color: theme.muted }]} numberOfLines={1}>
+              <Text className="text-[12px] ml-1 font-medium" style={{ color: theme.muted }} numberOfLines={1}>
                 {location.distance != null ? `${location.distance.toFixed(1)}km · ` : ''}
                 {location.address || 'Berlin, Germany'}
               </Text>
             </View>
 
-            <View style={styles.footer}>
+            <View className="flex-row justify-between items-center">
               <FeedbackStack vibeCounts={location.vibeCounts} />
 
-              <View style={styles.actions}>
+              <View className="flex-row gap-2">
                 <TouchableOpacity
-                  style={[
-                    styles.actionButton, 
+                  className="w-9 h-9 rounded-full items-center justify-center"
+                  style={StyleSheet.flatten([
                     { backgroundColor: theme.accent.peach + '30' },
                     isFavorited && { backgroundColor: theme.accent.peach }
-                  ]}
+                  ])}
                   onPress={(e) => { e.stopPropagation(); onFavorite?.(location.id); }}
                 >
                   <Heart size={20} color={isFavorited ? '#fff' : theme.ink} fill={isFavorited ? '#fff' : 'none'} />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.actionButton, { backgroundColor: theme.accent.peach + '30' }]}
+                  className="w-9 h-9 rounded-full items-center justify-center"
+                  style={{ backgroundColor: theme.accent.peach + '30' }}
                   onPress={(e) => { e.stopPropagation(); onShare?.(location); }}
                 >
                   <Share2 size={20} color={theme.ink} />

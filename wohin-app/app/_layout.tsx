@@ -1,10 +1,11 @@
+import '../global.css';
+import { Platform, View, StyleSheet } from 'react-native';
+
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
 import 'react-native-reanimated';
-import '../global.css';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ErrorBoundary } from '@/components/error-boundary';

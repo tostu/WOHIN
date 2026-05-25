@@ -73,42 +73,41 @@ function MapCard({
 
   return (
     <TouchableOpacity
-      style={[
-        styles.card,
-        {
-          width,
-          backgroundColor: theme.surface,
-          shadowColor: theme.shadow,
-        },
-      ]}
+      className="rounded-3xl p-[14px] shadow-lg"
+      style={{
+        width,
+        backgroundColor: theme.surface,
+        shadowColor: theme.shadow,
+      }}
       onPress={onPress}
       activeOpacity={0.9}
     >
-      <View style={styles.cardRow}>
-        <View style={[styles.imageBox, { backgroundColor: color + "30" }]}>
+      <View className="flex-row items-center gap-3.5">
+        <View className="w-14 h-14 rounded-[18px] overflow-hidden items-center justify-center" style={{ backgroundColor: color + "30" }}>
           {location.image ? (
             <Image
               source={location.image}
-              style={styles.cardImage}
+              className="w-full h-full"
               contentFit="cover"
               transition={200}
             />
           ) : (
-            <Text style={{ fontSize: 28 }}>
+            <Text className="text-[28px]">
               {location.activities[0]?.icon || "📍"}
             </Text>
           )}
         </View>
 
-        <View style={styles.cardContent}>
-          <Text style={[styles.cardName, { color: theme.ink }]} numberOfLines={1}>
+        <View className="flex-1 gap-[3px]">
+          <Text className="text-base font-black" style={{ color: theme.ink }} numberOfLines={1}>
             {location.name}
           </Text>
           {location.address && (
-            <View style={styles.addressRow}>
+            <View className="flex-row items-center gap-1">
               <MapPin size={11} color={theme.muted} />
               <Text
-                style={[styles.cardAddress, { color: theme.muted }]}
+                className="text-[12px] font-medium flex-1"
+                style={{ color: theme.muted }}
                 numberOfLines={1}
               >
                 {location.distance != null
@@ -119,8 +118,8 @@ function MapCard({
             </View>
           )}
           {location.activities[0] && (
-            <View style={[styles.tag, { backgroundColor: color + "40" }]}>
-              <Text style={[styles.tagText, { color: theme.ink }]}>
+            <View className="self-start px-2 py-0.5 rounded-lg mt-0.5" style={{ backgroundColor: color + "40" }}>
+              <Text className="text-[10px] font-bold" style={{ color: theme.ink }}>
                 {location.activities[0].icon} {location.activities[0].name}
               </Text>
             </View>
@@ -129,7 +128,8 @@ function MapCard({
 
         {hasCoords && (
           <TouchableOpacity
-            style={[styles.navButton, { backgroundColor: color }]}
+            className="w-10 h-10 rounded-[14px] items-center justify-center"
+            style={{ backgroundColor: color }}
             onPress={() =>
               openInMaps(
                 location.coordinates!.lat,
@@ -242,20 +242,21 @@ export default function MapScreen() {
   if (Platform.OS === "web") {
     return (
       <SafeAreaView
-        style={[styles.container, { backgroundColor: theme.background }]}
+        className="flex-1"
+        style={{ backgroundColor: theme.background }}
         edges={["top"]}
       >
-        <View style={styles.header}>
-          <Text style={[styles.subTitle, { color: theme.muted }]}>
+        <View className="px-5 pt-5 pb-3">
+          <Text className="text-[10px] font-black tracking-[2px] mb-1" style={{ color: theme.muted }}>
             BERLIN · ALL SPOTS
           </Text>
-          <Text style={[styles.title, { color: theme.ink }]}>On the Map</Text>
-          <Text style={[styles.desc, { color: theme.muted }]}>
+          <Text className="text-4xl font-black tracking-tighter" style={{ color: theme.ink }}>On the Map</Text>
+          <Text className="text-[13px] font-semibold mt-1" style={{ color: theme.muted }}>
             Map view is only available on iOS and Android
           </Text>
         </View>
         <ScrollView
-          contentContainerStyle={styles.list}
+          contentContainerStyle={{ padding: 16, paddingBottom: 100, gap: 12 }}
           showsVerticalScrollIndicator={false}
         >
           {locations.map((item) => (
@@ -274,14 +275,15 @@ export default function MapScreen() {
   if (loading) {
     return (
       <SafeAreaView
-        style={[styles.container, { backgroundColor: theme.background }]}
+        className="flex-1"
+        style={{ backgroundColor: theme.background }}
         edges={["top"]}
       >
-        <View style={styles.header}>
-          <Text style={[styles.subTitle, { color: theme.muted }]}>
+        <View className="px-5 pt-5 pb-3">
+          <Text className="text-[10px] font-black tracking-[2px] mb-1" style={{ color: theme.muted }}>
             BERLIN · ALL SPOTS
           </Text>
-          <Text style={[styles.title, { color: theme.ink }]}>On the Map</Text>
+          <Text className="text-4xl font-black tracking-tighter" style={{ color: theme.ink }}>On the Map</Text>
         </View>
         <ScrollView showsVerticalScrollIndicator={false}>
           <LocationCardSkeleton />
@@ -293,7 +295,7 @@ export default function MapScreen() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <View className="flex-1" style={{ backgroundColor: theme.background }}>
       <NativeMapView
         mapRef={mapRef}
         initialRegion={initialRegion}
@@ -305,30 +307,26 @@ export default function MapScreen() {
       />
 
       <SafeAreaView
-        style={styles.overlayTop}
+        className="absolute top-0 left-0 right-0 flex-row items-start justify-between px-4 gap-3"
         edges={["top"]}
         pointerEvents="box-none"
       >
         <View
-          style={[
-            styles.floatingHeader,
-            { backgroundColor: theme.surface, shadowColor: theme.shadow },
-          ]}
+          className="flex-1 rounded-[20px] px-4 py-3 mt-2 shadow-md"
+          style={{ backgroundColor: theme.surface, shadowColor: theme.shadow }}
         >
-          <Text style={[styles.subTitle, { color: theme.muted }]}>
+          <Text className="text-[10px] font-black tracking-[2px] mb-1" style={{ color: theme.muted }}>
             BERLIN · {withCoords.length} SPOTS
           </Text>
-          <Text style={[styles.headerTitle, { color: theme.ink }]}>
+          <Text className="text-[22px] font-black tracking-[-0.5px]" style={{ color: theme.ink }}>
             On the Map
           </Text>
         </View>
 
         {userLocation && (
           <TouchableOpacity
-            style={[
-              styles.locateButton,
-              { backgroundColor: theme.surface, shadowColor: theme.shadow },
-            ]}
+            className="mt-2 w-12 h-12 rounded-full items-center justify-center shadow-md"
+            style={{ backgroundColor: theme.surface, shadowColor: theme.shadow }}
             onPress={recenterOnUser}
             activeOpacity={0.8}
           >
@@ -337,7 +335,7 @@ export default function MapScreen() {
         )}
       </SafeAreaView>
 
-      <SafeAreaView style={styles.overlayBottom} edges={["bottom"]}>
+      <SafeAreaView className="absolute left-0 right-0 bottom-0" edges={["bottom"]}>
         <FlatList
           ref={listRef}
           data={withCoords}
@@ -348,7 +346,7 @@ export default function MapScreen() {
           decelerationRate="fast"
           snapToAlignment="start"
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.carousel}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 12 }}
           onMomentumScrollEnd={onCardScroll}
           ItemSeparatorComponent={() => <View style={{ width: CARD_SPACING }} />}
           getItemLayout={(_, index) => ({

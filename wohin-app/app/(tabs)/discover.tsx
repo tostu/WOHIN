@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ScrollView,
-  StyleSheet,
   TouchableOpacity,
   Modal,
   RefreshControl,
@@ -179,9 +178,8 @@ export default function DiscoverScreen() {
     : activeList
     ? activeList.locations || []
     : [];
-
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: theme.background }}>
       <ScrollView 
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -193,36 +191,37 @@ export default function DiscoverScreen() {
           />
         }
       >
-        <View style={styles.header}>
-          <Text style={[styles.subTitle, { color: theme.muted }]}>BERLIN · PICK YOUR MOOD</Text>
-          <Text style={[styles.title, { color: theme.ink }]}>
-            {"What's the "}<Text style={styles.italic}>vibe</Text>?
+        <View className="p-5">
+          <Text className="text-[10px] font-black tracking-[2px] mb-1" style={{ color: theme.muted }}>BERLIN · PICK YOUR MOOD</Text>
+          <Text className="text-4xl font-black tracking-tighter" style={{ color: theme.ink }}>
+            {"What's the "}<Text className="italic">vibe</Text>?
           </Text>
-          <Text style={[styles.description, { color: theme.muted }]}>
+          <Text className="text-sm font-semibold mt-1" style={{ color: theme.muted }}>
             {"One tap. We'll handle the rest."}
           </Text>
         </View>
 
         {curatedLists.length > 0 && (
-          <View style={styles.guidesContainer}>
-            <Text style={[styles.guidesHeader, { color: theme.ink }]}>Curated Guides 🗺️</Text>
+          <View className="pt-2 pb-5">
+            <Text className="text-lg font-black px-5 mb-3 tracking-tight" style={{ color: theme.ink }}>Curated Guides 🗺️</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.guidesScroll}
+              contentContainerStyle={{ paddingHorizontal: 20 }}
             >
               {curatedLists.map((list) => (
                 <TouchableOpacity
                   key={list.id}
-                  style={[styles.guideCard, { backgroundColor: theme.surface, borderColor: theme.border }]}
+                  className="w-[280px] h-[110px] rounded-[24px] p-4 mr-4 flex-row items-center border-2"
+                  style={{ backgroundColor: theme.surface, borderColor: theme.border }}
                   onPress={() => openCuratedList(list)}
                 >
-                  <View style={[styles.guideEmojiCircle, { backgroundColor: theme.accent.peach + "20" }]}>
-                    <Text style={styles.guideEmoji}>{list.emoji || "📍"}</Text>
+                  <View className="w-12 h-12 rounded-full items-center justify-center mr-4" style={{ backgroundColor: theme.accent.peach + "20" }}>
+                    <Text className="text-2xl">{list.emoji || "📍"}</Text>
                   </View>
-                  <View style={styles.guideTextContainer}>
-                    <Text style={[styles.guideTitle, { color: theme.ink }]} numberOfLines={1}>{list.title}</Text>
-                    <Text style={[styles.guideDesc, { color: theme.muted }]} numberOfLines={2}>{list.description}</Text>
+                  <View className="flex-1 justify-center">
+                    <Text className="text-base font-black mb-1" style={{ color: theme.ink }} numberOfLines={1}>{list.title}</Text>
+                    <Text className="text-xs font-medium leading-4" style={{ color: theme.muted }} numberOfLines={2}>{list.description}</Text>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -230,35 +229,32 @@ export default function DiscoverScreen() {
           </View>
         )}
 
-        <View style={styles.grid}>
+        <View className="p-3 flex-row flex-wrap">
           {vibes.map((vibe) => (
             <TouchableOpacity
               key={vibe.id}
-              style={[styles.tile, { backgroundColor: vibe.bg[0] }]}
+              className="w-[46%] h-[160px] m-[2%] rounded-[28px] p-4 overflow-hidden"
+              style={{ backgroundColor: vibe.bg[0] }}
               onPress={() => openVibe(vibe)}
             >
-              <View style={styles.tileContent}>
-                <View style={styles.tileTop}>
-                  <View style={styles.emojiCircle}>
-                    <Text style={styles.emoji}>{vibe.emoji}</Text>
+              <View className="flex-1 justify-between">
+                <View className="flex-row justify-between">
+                  <View className="w-10 h-10 rounded-full items-center justify-center" style={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}>
+                    <Text className="text-xl">{vibe.emoji}</Text>
                   </View>
                 </View>
                 <View>
                   <Text
-                    style={[
-                      styles.tileName,
-                      { color: vibe.ink === "light" ? "#fefcf4" : "#2c2b29" },
-                    ]}
+                    className="text-2xl font-black tracking-[-0.5px]"
+                    style={{ color: vibe.ink === "light" ? "#fefcf4" : "#2c2b29" }}
                   >
                     {vibe.name}
                   </Text>
                   <Text
-                    style={[
-                      styles.tileTagline,
-                      {
-                        color: vibe.ink === "light" ? "rgba(254, 252, 244, 0.5)" : "rgba(44, 43, 41, 0.5)",
-                      },
-                    ]}
+                    className="text-[10px] font-bold"
+                    style={{
+                      color: vibe.ink === "light" ? "rgba(254, 252, 244, 0.5)" : "rgba(44, 43, 41, 0.5)",
+                    }}
                   >
                     {vibe.tagline}
                   </Text>
@@ -276,25 +272,26 @@ export default function DiscoverScreen() {
         transparent={true}
         onRequestClose={closeModal}
       >
-        <View style={[styles.modalOverlay, { backgroundColor: theme.overlay }]}>
-          <View style={[styles.modalContent, { backgroundColor: theme.background }]}>
-            <View style={[styles.modalIndicator, { backgroundColor: theme.border }]} />
+        <View className="flex-1 justify-end" style={{ backgroundColor: theme.overlay }}>
+          <View className="rounded-t-[40px] h-[88%] pt-3" style={{ backgroundColor: theme.background }}>
+            <View className="w-10 h-1.5 rounded-[3px] self-center mb-5" style={{ backgroundColor: theme.border }} />
 
-            <View style={styles.modalHeader}>
-              <View style={{ flex: 1, marginRight: 16 }}>
-                <Text style={[styles.modalSubTitle, { color: theme.muted }]}>
+            <View className="flex-row justify-between px-6 mb-6">
+              <View className="flex-1 mr-4">
+                <Text className="text-[10px] font-black tracking-[2px] mb-1" style={{ color: theme.muted }}>
                   {activeVibe ? "VIBE" : "GUIDE"} · {results.length} spot{results.length === 1 ? "" : "s"}
                 </Text>
-                <Text style={[styles.modalTitle, { color: theme.ink }]} numberOfLines={1}>
-                  <Text style={{ fontSize: 24 }}>{activeVibe ? activeVibe.emoji : activeList?.emoji}</Text>{" "}
+                <Text className="text-[32px] font-black tracking-tighter" style={{ color: theme.ink }} numberOfLines={1}>
+                  <Text className="text-2xl">{activeVibe ? activeVibe.emoji : activeList?.emoji}</Text>{" "}
                   {activeVibe ? activeVibe.name : activeList?.title}
                 </Text>
-                <Text style={[styles.modalTagline, { color: theme.muted }]} numberOfLines={2}>
+                <Text className="text-xs font-semibold" style={{ color: theme.muted }} numberOfLines={2}>
                   {activeVibe ? activeVibe.tagline : activeList?.description}
                 </Text>
               </View>
               <TouchableOpacity
-                style={[styles.closeButton, { backgroundColor: theme.ink }]}
+                className="w-11 h-11 rounded-full items-center justify-center"
+                style={{ backgroundColor: theme.ink }}
                 onPress={closeModal}
               >
                 <X size={24} color={theme.background} />
@@ -302,20 +299,20 @@ export default function DiscoverScreen() {
             </View>
 
             {isLoading ? (
-              <ScrollView contentContainerStyle={styles.resultsScroll}>
+              <ScrollView className="pt-2">
                 <LocationCardSkeleton />
                 <LocationCardSkeleton />
                 <LocationCardSkeleton />
               </ScrollView>
             ) : (
-              <ScrollView contentContainerStyle={styles.resultsScroll}>
+              <ScrollView className="pt-2">
                 {results.length > 0 ? (
                   results.map((loc) => (
                     <LocationCard key={loc.id} location={loc} isFavorited={isFavorited(loc.id)} onFavorite={toggleFavorite} onShare={shareLocation} />
                   ))
                 ) : (
-                  <View style={styles.emptyState}>
-                    <Text style={[styles.emptyText, { color: theme.muted }]}>
+                  <View className="p-10 items-center">
+                    <Text className="text-base font-semibold text-center" style={{ color: theme.muted }}>
                       No spots found here yet! ✨
                     </Text>
                   </View>
@@ -330,177 +327,3 @@ export default function DiscoverScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    padding: 20,
-  },
-  subTitle: {
-    fontSize: 10,
-    fontWeight: "900",
-    letterSpacing: 2,
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 36,
-    fontWeight: "900",
-    letterSpacing: -1,
-  },
-  italic: {
-    fontStyle: "italic",
-  },
-  description: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginTop: 4,
-  },
-  guidesContainer: {
-    paddingTop: 10,
-    paddingBottom: 20,
-  },
-  guidesHeader: {
-    fontSize: 18,
-    fontWeight: "900",
-    paddingHorizontal: 20,
-    marginBottom: 12,
-    letterSpacing: -0.5,
-  },
-  guidesScroll: {
-    paddingHorizontal: 20,
-  },
-  guideCard: {
-    width: 280,
-    height: 110,
-    borderRadius: 24,
-    padding: 16,
-    marginRight: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 2,
-  },
-  guideEmojiCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 16,
-  },
-  guideEmoji: {
-    fontSize: 24,
-  },
-  guideTextContainer: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  guideTitle: {
-    fontSize: 16,
-    fontWeight: "900",
-    marginBottom: 4,
-  },
-  guideDesc: {
-    fontSize: 12,
-    fontWeight: "500",
-    lineHeight: 16,
-  },
-  grid: {
-    padding: 12,
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  tile: {
-    width: "46%",
-    height: 160,
-    margin: "2%",
-    borderRadius: 28,
-    padding: 16,
-    overflow: "hidden",
-  },
-  tileContent: {
-    flex: 1,
-    justifyContent: "space-between",
-  },
-  tileTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  emojiCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.25)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  emoji: {
-    fontSize: 20,
-  },
-  tileName: {
-    fontSize: 24,
-    fontWeight: "900",
-    letterSpacing: -0.5,
-  },
-  tileTagline: {
-    fontSize: 10,
-    fontWeight: "700",
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
-    height: "88%",
-    paddingTop: 12,
-  },
-  modalIndicator: {
-    width: 40,
-    height: 6,
-    borderRadius: 3,
-    alignSelf: "center",
-    marginBottom: 20,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 24,
-    marginBottom: 24,
-  },
-  modalSubTitle: {
-    fontSize: 10,
-    fontWeight: "900",
-    letterSpacing: 2,
-    marginBottom: 4,
-  },
-  modalTitle: {
-    fontSize: 32,
-    fontWeight: "900",
-    letterSpacing: -1,
-  },
-  modalTagline: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  closeButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  resultsScroll: {
-    paddingTop: 10,
-  },
-  emptyState: {
-    padding: 40,
-    alignItems: "center",
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-});

@@ -59,7 +59,7 @@ export default function OnboardingScreen() {
       : theme.accent.sunny;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+    <SafeAreaView style={StyleSheet.flatten([styles.container, { backgroundColor: theme.background }])}>
       <View style={styles.content}>
         <Animated.View
           key={`slide-${slide.id}`}
@@ -67,12 +67,12 @@ export default function OnboardingScreen() {
           exiting={Platform.OS !== 'web' ? FadeOutLeft.duration(400) : undefined}
           style={styles.slide}
         >
-          <View style={[styles.iconContainer, { backgroundColor: accentColor + '20' }]}>
+          <View style={StyleSheet.flatten([styles.iconContainer, { backgroundColor: accentColor + '20' }])}>
             <Icon size={80} color={accentColor} />
           </View>
           
-          <Text style={[styles.title, { color: theme.ink }]}>{slide.title}</Text>
-          <Text style={[styles.description, { color: theme.muted }]}>{slide.description}</Text>
+          <Text style={StyleSheet.flatten([styles.title, { color: theme.ink }])}>{slide.title}</Text>
+          <Text style={StyleSheet.flatten([styles.description, { color: theme.muted }])}>{slide.description}</Text>
         </Animated.View>
 
         <View style={styles.footer}>
@@ -80,20 +80,20 @@ export default function OnboardingScreen() {
             {slides.map((_, i) => (
               <View 
                 key={i} 
-                style={[
+                style={StyleSheet.flatten([
                   styles.dot, 
                   { backgroundColor: i === currentSlide ? accentColor : theme.border },
                   i === currentSlide && { width: 24 }
-                ]} 
+                ])} 
               />
             ))}
           </View>
 
           <TouchableOpacity 
-            style={[styles.button, { backgroundColor: theme.ink }]} 
+            style={StyleSheet.flatten([styles.button, { backgroundColor: theme.ink }])} 
             onPress={handleNext}
           >
-            <Text style={[styles.buttonText, { color: theme.background }]}>
+            <Text style={StyleSheet.flatten([styles.buttonText, { color: theme.background }])}>
               {currentSlide === slides.length - 1 ? 'Get Started' : 'Next'}
             </Text>
             <ArrowRight size={20} color={theme.background} />

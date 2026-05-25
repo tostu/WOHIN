@@ -34,11 +34,11 @@ export default function LocationDetailScreen() {
 
   if (isLoadingLocation) {
     return (
-      <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <View className="flex-1" style={{ backgroundColor: theme.background }}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <Skeleton width="100%" height={400} borderRadius={0} />
-          <View style={[styles.content, { marginTop: -30 }]}>
-            <View style={{ flexDirection: 'row', gap: 8, marginBottom: 32 }}>
+          <View className="rounded-t-[40px] -mt-7 pt-8 px-6" style={{ backgroundColor: theme.background }}>
+            <View className="flex-row gap-2 mb-8">
               <Skeleton width={100} height={40} borderRadius={20} />
               <Skeleton width={100} height={40} borderRadius={20} />
             </View>
@@ -53,14 +53,14 @@ export default function LocationDetailScreen() {
 
   if (!location) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+      <View className="flex-1 justify-center items-center" style={{ backgroundColor: theme.background }}>
         <Text style={{ color: theme.ink }}>Location not found</Text>
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <View className="flex-1" style={{ backgroundColor: theme.background }}>
       <Stack.Screen options={{
         title: location.name,
         headerTransparent: true,
@@ -72,7 +72,7 @@ export default function LocationDetailScreen() {
               message: `Check out ${location.name} on WOHIN!${location.address ? ` - ${location.address}` : ''}`,
               url: `wohinapp://location/${location.slug}`,
             })}
-            style={{ padding: 8 }}
+            className="p-2"
           >
             <Share2 size={22} color="#fff" />
           </TouchableOpacity>
@@ -80,34 +80,34 @@ export default function LocationDetailScreen() {
       }} />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.hero}>
+        <View className="h-[400px] w-full relative">
           {location.image ? (
-            <Image source={location.image} style={styles.heroImage} contentFit="cover" />
+            <Image source={location.image} className="w-full h-full" contentFit="cover" />
           ) : (
-            <View style={[styles.heroPlaceholder, { backgroundColor: theme.accent.peach + '20' }]}>
-              <Text style={{ fontSize: 80 }}>🏙️</Text>
+            <View className="w-full h-full items-center justify-center" style={{ backgroundColor: theme.accent.peach + '20' }}>
+              <Text className="text-[80px]">🏙️</Text>
             </View>
           )}
-          <View style={[styles.heroOverlay, { backgroundColor: theme.overlay }]} />
-          <View style={styles.heroContent}>
-            <Text style={styles.name}>{location.name}</Text>
-            <Text style={styles.address}>{location.address || 'Address coming soon'}</Text>
+          <View className="absolute inset-0" style={{ backgroundColor: theme.overlay }} />
+          <View className="absolute bottom-10 left-6 right-6">
+            <Text className="text-4xl font-black text-white tracking-tighter">{location.name}</Text>
+            <Text className="text-base font-semibold text-white/90 mt-1">{location.address || 'Address coming soon'}</Text>
           </View>
         </View>
 
-        <View style={[styles.content, { backgroundColor: theme.background }]}>
-          <View style={styles.activitiesScroll}>
+        <View className="rounded-t-[40px] -mt-7 pt-8 px-6" style={{ backgroundColor: theme.background }}>
+          <View className="mb-8">
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
               {location.activities.map((activity) => (
                 <TouchableOpacity
                   key={activity.id}
                   onPress={() => setSelectedActivityId(activity.id)}
-                  style={[
-                    styles.activityButton,
+                  className="px-5 py-2.5 rounded-[20px]"
+                  style={StyleSheet.flatten([
                     selectedActivityId === activity.id 
                       ? { backgroundColor: theme.accent.peach } 
                       : { backgroundColor: theme.border }
-                  ]}
+                  ])}
                 >
                   <Text style={{ color: theme.ink }}>{activity.icon} {activity.name}</Text>
                 </TouchableOpacity>
@@ -115,16 +115,16 @@ export default function LocationDetailScreen() {
             </ScrollView>
           </View>
 
-          <View style={styles.descriptionContainer}>
+          <View className="mb-8">
             {Array.isArray((location as any).description) ? (
               <PortableText value={(location as any).description} />
             ) : (
-              <Text style={[styles.description, { color: theme.ink }]}>No description available yet.</Text>
+              <Text className="text-base leading-6 opacity-80" style={{ color: theme.ink }}>No description available yet.</Text>
             )}
           </View>
 
           {selectedActivityId && (
-            <View style={[styles.vibeCheckCard, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
+            <View className="rounded-[32px] p-2 mb-8 shadow-sm" style={{ backgroundColor: theme.surface, shadowColor: theme.shadow }}>
               <VibeCheck
                 locationId={location.id}
                 activityId={selectedActivityId}
@@ -133,19 +133,19 @@ export default function LocationDetailScreen() {
             </View>
           )}
 
-          <View style={[styles.historyCard, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
-            <Text style={[styles.historyTitle, { color: theme.ink }]}>✨ Vibe History</Text>
+          <View className="rounded-[32px] p-6 mb-8 shadow-sm" style={{ backgroundColor: theme.surface, shadowColor: theme.shadow }}>
+            <Text className="text-xl font-black mb-5" style={{ color: theme.ink }}>✨ Vibe History</Text>
             {vibeHistory.length === 0 ? (
-              <Text style={[styles.emptyHistory, { color: theme.muted }]}>No vibe checks yet. Be the first to drop one! 💖</Text>
+              <Text className="text-sm italic" style={{ color: theme.muted }}>No vibe checks yet. Be the first to drop one! 💖</Text>
             ) : (
-              <View style={styles.statsGrid}>
+              <View className="flex-row flex-wrap gap-3">
                 {Object.entries(vibeCounts).map(([key, count]) => (
                   count as number > 0 ? (
-                    <View key={key} style={[styles.statBox, { backgroundColor: theme.background }]}>
-                      <Text style={styles.statEmoji}>
+                    <View key={key} className="flex-1 min-w-[45%] rounded-3xl p-4 items-center justify-center" style={{ backgroundColor: theme.background }}>
+                      <Text className="text-2xl mb-1">
                         {key === 'sparkle' ? '✨' : key === 'fire' ? '🔥' : key === 'chill' ? '🧊' : '👎'}
                       </Text>
-                      <Text style={[styles.statCount, { color: theme.ink }]}>{count as number}</Text>
+                      <Text className="text-lg font-black" style={{ color: theme.ink }}>{count as number}</Text>
                     </View>
                   ) : null
                 ))}
@@ -159,119 +159,3 @@ export default function LocationDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  hero: {
-    height: 400,
-    width: '100%',
-    position: 'relative',
-  },
-  heroImage: {
-    width: '100%',
-    height: '100%',
-  },
-  heroPlaceholder: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  heroOverlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  heroContent: {
-    position: 'absolute',
-    bottom: 40,
-    left: 24,
-    right: 24,
-  },
-  name: {
-    fontSize: 40,
-    fontWeight: '900',
-    color: '#fff',
-    letterSpacing: -1,
-  },
-  address: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
-    marginTop: 4,
-  },
-  content: {
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
-    marginTop: -30,
-    paddingTop: 32,
-    paddingHorizontal: 24,
-  },
-  activitiesScroll: {
-    marginBottom: 32,
-  },
-  activityButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  descriptionContainer: {
-    marginBottom: 32,
-  },
-  description: {
-    fontSize: 16,
-    lineHeight: 24,
-    opacity: 0.8,
-  },
-  vibeCheckCard: {
-    borderRadius: 32,
-    padding: 8,
-    marginBottom: 32,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    elevation: 2,
-  },
-  historyCard: {
-    borderRadius: 32,
-    padding: 24,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    elevation: 2,
-  },
-  historyTitle: {
-    fontSize: 20,
-    fontWeight: '900',
-    marginBottom: 20,
-  },
-  emptyHistory: {
-    fontSize: 14,
-    fontStyle: 'italic',
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  statBox: {
-    flex: 1,
-    minWidth: '45%',
-    borderRadius: 24,
-    padding: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statEmoji: {
-    fontSize: 24,
-    marginBottom: 4,
-  },
-  statCount: {
-    fontSize: 18,
-    fontWeight: '900',
-  },
-});

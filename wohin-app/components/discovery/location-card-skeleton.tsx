@@ -8,7 +8,7 @@ export function LocationCardSkeleton() {
   
   return (
     <View style={styles.container}>
-      <View style={[styles.card, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
+      <View style={StyleSheet.flatten([styles.card, { backgroundColor: theme.surface, shadowColor: theme.shadow }])}>
         <View style={styles.imageContainer}>
           <Skeleton width={120} height={120} borderRadius={24} />
         </View>

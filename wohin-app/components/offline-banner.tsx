@@ -34,14 +34,14 @@ export function OfflineBanner() {
 
   return (
     <Animated.View 
-      style={[
+      style={StyleSheet.flatten([
         styles.container, 
         { 
           paddingTop: Math.max(insets.top, 20),
           backgroundColor: theme.accent.peach,
           transform: [{ translateY }]
         }
-      ]}
+      ])}
     >
       <View style={styles.content}>
         <CloudOff size={16} color="#fff" />

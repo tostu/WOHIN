@@ -90,7 +90,11 @@ export default function HomeScreen() {
   }, [refetchActivities, refetchFeatured]);
 
   const handleActivityPress = (activityId: string | null) => {
-    setSelectedActivityId(activityId);
+    if (selectedActivityId === activityId) {
+      setSelectedActivityId(null);
+    } else {
+      setSelectedActivityId(activityId);
+    }
     setSearchQuery("");
   };
 
@@ -118,10 +122,10 @@ export default function HomeScreen() {
 
   if (isLoadingInitial) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={["top"]}>
+      <SafeAreaView style={StyleSheet.flatten([styles.container, { backgroundColor: theme.background }])} edges={["top"]}>
         <View style={styles.header}>
-          <Text style={[styles.subTitle, { color: theme.muted }]}>BERLIN · TODAY</Text>
-          <Text style={[styles.title, { color: theme.ink }]}>
+          <Text style={StyleSheet.flatten([styles.subTitle, { color: theme.muted }])}>BERLIN · TODAY</Text>
+          <Text style={StyleSheet.flatten([styles.title, { color: theme.ink }])}>
             Whatcha <Text style={styles.italic}>wanna</Text> do?
           </Text>
         </View>
@@ -136,15 +140,15 @@ export default function HomeScreen() {
 
   if (hasError) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={["top"]}>
+      <SafeAreaView style={StyleSheet.flatten([styles.container, { backgroundColor: theme.background }])} edges={["top"]}>
         <View style={styles.errorContainer}>
           <Text style={styles.errorEmoji}>⚡</Text>
-          <Text style={[styles.errorTitle, { color: theme.ink }]}>Signal Lost</Text>
-          <Text style={[styles.errorText, { color: theme.muted }]}>
+          <Text style={StyleSheet.flatten([styles.errorTitle, { color: theme.ink }])}>Signal Lost</Text>
+          <Text style={StyleSheet.flatten([styles.errorText, { color: theme.muted }])}>
             Unable to reach the magic. Check your connection!
           </Text>
           <TouchableOpacity 
-            style={[styles.retryButton, { backgroundColor: theme.accent.peach }]} 
+            style={StyleSheet.flatten([styles.retryButton, { backgroundColor: theme.accent.peach }])} 
             onPress={() => {
               refetchActivities();
               refetchFeatured();
@@ -158,7 +162,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={["top"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: theme.background }} edges={["top"]}>
       <ScrollView 
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -171,19 +175,20 @@ export default function HomeScreen() {
         }
       >
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={[styles.subTitle, { color: theme.muted }]}>BERLIN · TODAY</Text>
-          <Text style={[styles.title, { color: theme.ink }]}>
+        <View className="px-5 pt-5 mb-5">
+          <Text className="text-[10px] font-black tracking-[2px] mb-1" style={{ color: theme.muted }}>BERLIN · TODAY</Text>
+          <Text className="text-4xl font-black tracking-tighter" style={{ color: theme.ink }}>
             Whatcha <Text style={styles.italic}>wanna</Text> do?
           </Text>
         </View>
 
         {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <View style={[styles.searchBar, { backgroundColor: theme.surface, shadowColor: theme.shadow }]}>
+        <View className="px-5 mb-4">
+          <View className="flex-row items-center rounded-[20px] px-4 py-3 gap-2.5 shadow-sm" style={{ backgroundColor: theme.surface, shadowColor: theme.shadow }}>
             <Search size={18} color={theme.muted} />
             <TextInput
-              style={[styles.searchInput, { color: theme.ink }]}
+              className="flex-1 text-base font-semibold"
+              style={{ color: theme.ink }}
               placeholder="Search spots..."
               placeholderTextColor={theme.muted}
               value={searchQuery}
@@ -198,11 +203,54 @@ export default function HomeScreen() {
           </View>
         </View>
 
+        {/* Activity Pills */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.activitiesContainer}
+        >
+          <TouchableOpacity
+            style={StyleSheet.flatten([
+              styles.activityPill,
+              { 
+                backgroundColor: selectedActivityId === null ? theme.accent.peach : theme.surface, 
+                borderColor: selectedActivityId === null ? theme.accent.peach : theme.border 
+              },
+            ])}
+            onPress={() => handleActivityPress(null)}
+          >
+            <Text style={StyleSheet.flatten([styles.activityName, { color: selectedActivityId === null ? "#fff" : theme.ink }])}>All</Text>
+          </TouchableOpacity>
+
+          {activities.map((activity) => {
+            const isSelected = selectedActivityId === activity.id;
+            const activeColor = getActivityColor(activity.themeColor);
+            return (
+              <TouchableOpacity
+                key={activity.id}
+                style={StyleSheet.flatten([
+                  styles.activityPill,
+                  { 
+                    backgroundColor: isSelected ? activeColor : theme.surface, 
+                    borderColor: isSelected ? activeColor : theme.border 
+                  },
+                ])}
+                onPress={() => handleActivityPress(activity.id)}
+              >
+                {activity.icon && (
+                  <Text style={styles.activityIcon}>{activity.icon}</Text>
+                )}
+                <Text style={StyleSheet.flatten([styles.activityName, { color: isSelected ? "#fff" : theme.ink }])}>{activity.name}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+
         {/* Search or Filter Results */}
         {(searchQuery.trim().length > 0 || selectedActivityId !== null) ? (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={[styles.sectionTitle, { color: theme.ink }]}>
+              <Text style={StyleSheet.flatten([styles.sectionTitle, { color: theme.ink }])}>
                 {searching || filtering
                   ? "Loading..."
                   : selectedActivityId 
@@ -220,7 +268,7 @@ export default function HomeScreen() {
                 <LocationCard key={location.id} location={location} isFavorited={isFavorited(location.id)} onFavorite={toggleFavorite} onShare={shareLocation} />
               ))
             ) : (
-              <Text style={[styles.emptySearch, { color: theme.muted }]}>
+              <Text style={StyleSheet.flatten([styles.emptySearch, { color: theme.muted }])}>
                 No spots found. Try a different mood! ✨
               </Text>
             )}
@@ -229,55 +277,12 @@ export default function HomeScreen() {
         ) : (
           <>
 
-        {/* Activity Pills */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.activitiesContainer}
-        >
-          <TouchableOpacity
-            style={[
-              styles.activityPill,
-              { 
-                backgroundColor: selectedActivityId === null ? theme.accent.peach : theme.surface, 
-                borderColor: selectedActivityId === null ? theme.accent.peach : theme.border 
-              },
-            ]}
-            onPress={() => handleActivityPress(null)}
-          >
-            <Text style={[styles.activityName, { color: selectedActivityId === null ? "#fff" : theme.ink }]}>All</Text>
-          </TouchableOpacity>
-
-          {activities.map((activity) => {
-            const isSelected = selectedActivityId === activity.id;
-            const activeColor = getActivityColor(activity.themeColor);
-            return (
-              <TouchableOpacity
-                key={activity.id}
-                style={[
-                  styles.activityPill,
-                  { 
-                    backgroundColor: isSelected ? activeColor : theme.surface, 
-                    borderColor: isSelected ? activeColor : theme.border 
-                  },
-                ]}
-                onPress={() => handleActivityPress(activity.id)}
-              >
-                {activity.icon && (
-                  <Text style={styles.activityIcon}>{activity.icon}</Text>
-                )}
-                <Text style={[styles.activityName, { color: isSelected ? "#fff" : theme.ink }]}>{activity.name}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-
         {/* Trending Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: theme.ink }]}>Trending</Text>
+            <Text style={StyleSheet.flatten([styles.sectionTitle, { color: theme.ink }])}>Trending</Text>
             <TouchableOpacity>
-              <Text style={[styles.seeAll, { color: theme.muted }]}>See all</Text>
+              <Text style={StyleSheet.flatten([styles.seeAll, { color: theme.muted }])}>See all</Text>
             </TouchableOpacity>
           </View>
 
@@ -294,14 +299,14 @@ export default function HomeScreen() {
                 <Link key={spot.id} href={`/location/${spot.slug}`} asChild>
                   <TouchableOpacity 
                     activeOpacity={0.9} 
-                    style={[
+                    style={StyleSheet.flatten([
                       styles.trendingCard, 
                       { 
                         backgroundColor: theme.surface, 
                         shadowColor: theme.shadow,
                         borderColor: theme.border
                       }
-                    ]}
+                    ])}
                   >
                     <View style={styles.trendingImageContainer}>
                       {spot.image || (spot.photos && spot.photos[0]) ? (
@@ -313,12 +318,12 @@ export default function HomeScreen() {
                         />
                       ) : (
                         <View
-                          style={[
+                          style={StyleSheet.flatten([
                             styles.trendingImagePlaceholder,
                             {
                               backgroundColor: accentColor + "20",
                             },
-                          ]}
+                          ])}
                         >
                           <Text style={{ fontSize: 32 }}>
                             {primaryActivity?.icon || "📍"}
@@ -327,8 +332,8 @@ export default function HomeScreen() {
                       )}
                       
                       {primaryActivity && (
-                        <View style={[styles.vibeTag, { backgroundColor: accentColor }]}>
-                          <Text style={[styles.vibeTagText, { color: theme.ink }]}>
+                        <View style={StyleSheet.flatten([styles.vibeTag, { backgroundColor: accentColor }])}>
+                          <Text style={StyleSheet.flatten([styles.vibeTagText, { color: theme.ink }])}>
                             {primaryActivity.name.toUpperCase()}
                           </Text>
                         </View>
@@ -336,11 +341,11 @@ export default function HomeScreen() {
                     </View>
                     
                     <View style={styles.trendingContent}>
-                      <Text style={[styles.trendingName, { color: theme.ink }]} numberOfLines={1}>
+                      <Text style={StyleSheet.flatten([styles.trendingName, { color: theme.ink }])} numberOfLines={1}>
                         {spot.name}
                       </Text>
                       <View style={styles.trendingMeta}>
-                        <Text style={[styles.trendingAddress, { color: theme.muted }]} numberOfLines={1}>
+                        <Text style={StyleSheet.flatten([styles.trendingAddress, { color: theme.muted }])} numberOfLines={1}>
                           {spot.address?.split(",")[0] || "Berlin"}
                         </Text>
                       </View>
@@ -348,8 +353,8 @@ export default function HomeScreen() {
                       <View style={styles.trendingFooter}>
                         <FeedbackStack vibeCounts={spot.vibeCounts} />
                         {spot.rating != null && spot.rating > 0 && (
-                          <View style={[styles.trendingRatingBadge, { backgroundColor: theme.accent.sunny + '30' }]}>
-                            <Text style={[styles.trendingRatingText, { color: theme.ink }]}>⭐ {spot.rating.toFixed(1)}</Text>
+                          <View style={StyleSheet.flatten([styles.trendingRatingBadge, { backgroundColor: theme.accent.sunny + '30' }])}>
+                            <Text style={StyleSheet.flatten([styles.trendingRatingText, { color: theme.ink }])}>⭐ {spot.rating.toFixed(1)}</Text>
                           </View>
                         )}
                       </View>
@@ -367,9 +372,9 @@ export default function HomeScreen() {
             <View
               style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
             >
-              <Text style={[styles.sectionTitle, { color: theme.ink }]}>Just Landed</Text>
-              <View style={[styles.newBadge, { backgroundColor: theme.accent.matcha }]}>
-                <Text style={[styles.newBadgeText, { color: theme.ink }]}>NEW ✨</Text>
+              <Text style={StyleSheet.flatten([styles.sectionTitle, { color: theme.ink }])}>Just Landed</Text>
+              <View style={StyleSheet.flatten([styles.newBadge, { backgroundColor: theme.accent.matcha }])}>
+                <Text style={StyleSheet.flatten([styles.newBadgeText, { color: theme.ink }])}>NEW ✨</Text>
               </View>
             </View>
           </View>

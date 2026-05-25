@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Platform, Pressable } from "react-native";
+import { Platform, Pressable, StyleSheet } from "react-native";
 import type { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
 
 import { HapticTab } from "@/components/haptic-tab";
@@ -12,7 +12,7 @@ function WebTabButton(props: BottomTabBarButtonProps) {
     <Pressable
       onPress={props.onPress}
       onLongPress={props.onLongPress}
-      style={props.style as any}
+      style={StyleSheet.flatten(props.style as any)}
       accessibilityLabel={props.accessibilityLabel}
       testID={props.testID}
     >
@@ -30,7 +30,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: theme.tabIconSelected,
         tabBarInactiveTintColor: theme.tabIconDefault,
         headerShown: false,
-        tabBarButton: Platform.OS === 'web' ? WebTabButton : HapticTab,
+        tabBarButton: Platform.OS === "web" ? WebTabButton : HapticTab,
         tabBarStyle: Platform.select({
           web: {
             backgroundColor: theme.surface,
@@ -48,8 +48,8 @@ export default function TabLayout() {
             shadowOffset: { width: 0, height: -4 },
             shadowOpacity: 0.05,
             shadowRadius: 10,
-            height: Platform.OS === 'ios' ? 88 : 64,
-            paddingBottom: Platform.OS === 'ios' ? 30 : 10,
+            height: Platform.OS === "ios" ? 88 : 64,
+            paddingBottom: Platform.OS === "ios" ? 30 : 10,
           },
         }),
       }}

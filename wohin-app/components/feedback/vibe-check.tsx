@@ -205,13 +205,13 @@ export function VibeCheck({
     return backgroundColor;
   };
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: theme.muted }]}>DROP A VIBE</Text>
-        {currentVibe && <Text style={[styles.successText, { color: theme.accent.peach }]}>Vibe sent! 💌</Text>}
+    <View className="p-4">
+      <View className="flex-row justify-between items-center mb-5">
+        <Text className="text-[12px] font-black tracking-[2px]" style={{ color: theme.muted }}>DROP A VIBE</Text>
+        {currentVibe && <Text className="text-[10px] font-bold" style={{ color: theme.accent.peach }}>Vibe sent! 💌</Text>}
       </View>
 
-      <View style={styles.vibesGrid}>
+      <View className="flex-row justify-between">
         {vibesData.map((vibe) => {
           const animatedStyle = (animatedStyles as any)[vibe.id];
           const backgroundColor = getVibeStyleColor(vibe.color);
@@ -226,14 +226,14 @@ export function VibeCheck({
               style={{ overflow: "visible" }}
             >
               <Animated.View
-                style={[
-                  styles.vibeButton,
+                className="w-16 h-16 rounded-3xl items-center justify-center"
+                style={StyleSheet.flatten([
                   { backgroundColor },
                   currentVibe === vibe.id && { borderColor: theme.accent.peach, borderWidth: 3 },
                   animatedStyle,
-                ]}
+                ])}
               >
-                <Text style={styles.emoji}>{vibe.emoji}</Text>
+                <Text className="text-[32px]">{vibe.emoji}</Text>
                 {currentVibeParticles.map((p) => (
                   <AnimatedParticle
                     key={p.id}
@@ -255,31 +255,38 @@ export function VibeCheck({
         animationType="slide"
         onRequestClose={() => setShowAuthPrompt(false)}
       >
-        <Pressable style={styles.modalOverlay} onPress={() => setShowAuthPrompt(false)}>
+        <Pressable
+          className="flex-1 justify-end"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+          onPress={() => setShowAuthPrompt(false)}
+        >
           <Pressable
-            style={[styles.modalContent, { backgroundColor: theme.surface, borderColor: theme.border }]}
+            className="rounded-t-[32px] p-6 pb-10 border border-b-0"
+            style={{ backgroundColor: theme.surface, borderColor: theme.border }}
             onPress={(e) => e.stopPropagation()}
           >
-            <View style={styles.modalIndicator} />
-            <Text style={[styles.modalTitle, { color: theme.ink }]}>Join the Vibe Check 🔒</Text>
-            <Text style={[styles.modalSubtitle, { color: theme.muted }]}>
+            <View className="w-10 h-1.5 rounded-[3px] self-center mb-5 opacity-50" style={{ backgroundColor: "#ccc" }} />
+            <Text className="text-2xl font-black text-center mb-2.5" style={{ color: theme.ink }}>Join the Vibe Check 🔒</Text>
+            <Text className="text-[15px] font-semibold text-center leading-[22px] mb-6" style={{ color: theme.muted }}>
               Drop your rating to let others know if the vibe is immaculate or needs work! Sign in to join the community.
             </Text>
-            <View style={styles.modalButtons}>
+            <View className="gap-3">
               <TouchableOpacity
-                style={[styles.modalButtonPrimary, { backgroundColor: theme.accent.peach }]}
+                className="p-4 rounded-[20px] items-center justify-center"
+                style={{ backgroundColor: theme.accent.peach }}
                 onPress={() => {
                   setShowAuthPrompt(false);
                   router.push("/login");
                 }}
               >
-                <Text style={styles.modalButtonPrimaryText}>Sign In</Text>
+                <Text className="text-white text-base font-black">Sign In</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalButtonSecondary, { borderColor: theme.border }]}
+                className="p-4 rounded-[20px] items-center justify-center border"
+                style={{ borderColor: theme.border }}
                 onPress={() => setShowAuthPrompt(false)}
               >
-                <Text style={[styles.modalButtonSecondaryText, { color: theme.muted }]}>Cancel</Text>
+                <Text className="text-base font-bold" style={{ color: theme.muted }}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </Pressable>
@@ -288,100 +295,3 @@ export function VibeCheck({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 12,
-    fontWeight: "900",
-    letterSpacing: 2,
-  },
-  successText: {
-    fontSize: 10,
-    fontWeight: "700",
-  },
-  vibesGrid: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    overflow: "visible",
-  },
-  vibeButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "visible",
-  },
-  emoji: {
-    fontSize: 32,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    padding: 24,
-    paddingBottom: 40,
-    borderWidth: 1,
-    borderBottomWidth: 0,
-  },
-  modalIndicator: {
-    width: 40,
-    height: 5,
-    backgroundColor: "#ccc",
-    borderRadius: 3,
-    alignSelf: "center",
-    marginBottom: 20,
-    opacity: 0.5,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: "900",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  modalSubtitle: {
-    fontSize: 15,
-    fontWeight: "500",
-    textAlign: "center",
-    lineHeight: 22,
-    marginBottom: 24,
-  },
-  modalButtons: {
-    gap: 12,
-  },
-  modalButtonPrimary: {
-    padding: 16,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  modalButtonPrimaryText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "900",
-  },
-  modalButtonSecondary: {
-    padding: 16,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-  },
-  modalButtonSecondaryText: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
-});

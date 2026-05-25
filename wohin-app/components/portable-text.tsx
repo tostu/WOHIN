@@ -23,16 +23,18 @@ function renderSpan(
   index: number,
   theme: any,
 ) {
-  const style: any[] = [];
+  const styles: any[] = [];
   let onPress: (() => void) | undefined;
+  let className = "";
 
   for (const mark of span.marks ?? []) {
-    if (mark === "strong") style.push(styles.bold);
-    else if (mark === "em") style.push(styles.italic);
+    if (mark === "strong") className += " font-bold";
+    else if (mark === "em") className += " italic";
     else {
       const def = markDefs?.find((d) => d._key === mark);
       if (def?._type === "link" && def.href) {
-        style.push([styles.link, { color: theme.accent.peach }]);
+        className += " underline";
+        styles.push({ color: theme.accent.peach });
         const href = def.href;
         onPress = () => Linking.openURL(href);
       }
@@ -40,26 +42,29 @@ function renderSpan(
   }
 
   return (
-    <Text key={index} style={style} onPress={onPress}>
+    <Text key={index} className={className} style={StyleSheet.flatten(styles)} onPress={onPress}>
       {span.text}
     </Text>
   );
 }
 
 function renderBlock(block: PortableTextBlock, index: number, theme: any) {
-  const blockStyle =
-    block.style === "h1"
-      ? [styles.h1, { color: theme.ink }]
-      : block.style === "h2"
-        ? [styles.h2, { color: theme.ink }]
-        : block.style === "h3"
-          ? [styles.h3, { color: theme.ink }]
-          : block.style === "blockquote"
-            ? [styles.blockquote, { color: theme.muted, borderLeftColor: theme.accent.peach }]
-            : [styles.paragraph, { color: theme.ink }];
+  let blockClassName = "text-base leading-6 opacity-80";
+  const blockStyles: any[] = [{ color: theme.ink }];
+
+  if (block.style === "h1") {
+    blockClassName = "text-[28px] font-black";
+  } else if (block.style === "h2") {
+    blockClassName = "text-[22px] font-black";
+  } else if (block.style === "h3") {
+    blockClassName = "text-[18px] font-extrabold";
+  } else if (block.style === "blockquote") {
+    blockClassName = "text-base leading-6 italic border-l-[3px] pl-3";
+    blockStyles.push({ color: theme.muted, borderLeftColor: theme.accent.peach });
+  }
 
   const content = (
-    <Text key={block._key ?? index} style={blockStyle}>
+    <Text key={block._key ?? index} className={blockClassName} style={StyleSheet.flatten(blockStyles)}>
       {block.children?.map((child, i) =>
         renderSpan(child, block.markDefs, i, theme),
       )}
@@ -68,8 +73,8 @@ function renderBlock(block: PortableTextBlock, index: number, theme: any) {
 
   if (block.listItem === "bullet") {
     return (
-      <View key={block._key ?? index} style={styles.bulletRow}>
-        <Text style={[styles.bullet, { color: theme.ink }]}>•</Text>
+      <View key={block._key ?? index} className="flex-row gap-2 pl-1">
+        <Text className="text-base opacity-50" style={{ color: theme.ink }}>•</Text>
         {content}
       </View>
     );
@@ -81,25 +86,5 @@ function renderBlock(block: PortableTextBlock, index: number, theme: any) {
 export function PortableText({ value }: { value: PortableTextBlock[] }) {
   const theme = useAppTheme();
   if (!value?.length) return null;
-  return <View style={styles.container}>{value.map((block, i) => renderBlock(block, i, theme))}</View>;
+  return <View className="gap-2">{value.map((block, i) => renderBlock(block, i, theme))}</View>;
 }
-
-const styles = StyleSheet.create({
-  container: { gap: 8 },
-  paragraph: { fontSize: 16, lineHeight: 24, opacity: 0.8 },
-  h1: { fontSize: 28, fontWeight: "900" },
-  h2: { fontSize: 22, fontWeight: "900" },
-  h3: { fontSize: 18, fontWeight: "800" },
-  blockquote: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontStyle: "italic",
-    borderLeftWidth: 3,
-    paddingLeft: 12,
-  },
-  bold: { fontWeight: "700" },
-  italic: { fontStyle: "italic" },
-  link: { textDecorationLine: "underline" },
-  bulletRow: { flexDirection: "row", gap: 8, paddingLeft: 4 },
-  bullet: { fontSize: 16, opacity: 0.5 },
-});

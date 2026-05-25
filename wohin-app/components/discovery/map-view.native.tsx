@@ -56,14 +56,14 @@ export default function NativeMapView({
             tracksViewChanges={false}
           >
              <View
-                style={[
+                style={StyleSheet.flatten([
                   externalStyles.pin,
                   {
                     backgroundColor: color,
                     borderColor: theme.surface,
                     transform: [{ scale: isActive ? 1.25 : 1 }],
                   },
-                ]}
+                ])}
               >
                 <Text style={externalStyles.pinIcon}>
                   {loc.activities[0]?.icon || "📍"}

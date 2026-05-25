@@ -26,25 +26,25 @@ graph TD
 
 - `app/`: SvelteKit PWA Frontend.
 - `cms/`: Sanity Studio Content Management.
-- `wohin-app/`: Expo (React Native) Mobile App.
+- `wohin-app/`: Flutter Mobile App.
 - `wohin-backend/`: Hono (Cloudflare Workers) Backend.
 - `.specify/`: Governance and orchestration templates.
 
 ## 🛠️ Development
 
-WOHIN is managed as a monorepo using Bun.
+WOHIN is managed as a monorepo using Bun for JS parts and Flutter CLI for the mobile app.
 
-### Start all parts at once
+### Start JS parts at once
 ```bash
 bun dev
 ```
 
 ### Individual parts
 ```bash
-bun run dev:app      # SvelteKit
 bun run dev:cms      # Sanity
 bun run dev:backend  # Hono/Cloudflare
-bun run dev:mobile   # Expo (Web)
+bun run dev:site     # Astro
+cd wohin-app && flutter run # Flutter
 ```
 
 ## 🔄 The Workflow

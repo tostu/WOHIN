@@ -3,17 +3,14 @@
   "private": true,
   "workspaces": [
     "wohin-cms",
-    "wohin-app",
     "wohin-backend",
     "wohin-site"
   ],
   "scripts": {
-    "dev": "bun x concurrently -n \"cms,backend,mobile,site\" -c \"cyan,yellow,blue,magenta\" \"bun run --cwd wohin-cms dev\" \"bun run --cwd wohin-backend dev\" \"bun run --cwd wohin-app web\" \"bun run --cwd wohin-site dev\"",
-    "dev:go": "bun run --cwd wohin-app start",
-    "dev:full": "bun x concurrently -n \"cms,backend,mobile,site\" -c \"cyan,yellow,blue,magenta\" \"bun run --cwd wohin-cms dev\" \"bun run --cwd wohin-backend dev\" \"bun run --cwd wohin-app start\" \"bun run --cwd wohin-site dev\"",
+    "dev": "bun x concurrently -n \"cms,backend,site\" -c \"cyan,yellow,magenta\" \"bun run --cwd wohin-cms dev\" \"bun run --cwd wohin-backend dev\" \"bun run --cwd wohin-site dev\"",
     "dev:cms": "bun run --cwd wohin-cms dev",
     "dev:backend": "bun run --cwd wohin-backend dev",
-    "dev:mobile": "bun run --cwd wohin-app web",
+    "dev:mobile": "cd wohin-app && flutter run -d macos",
     "dev:site": "bun run --cwd wohin-site dev",
     "install:all": "bun install"
   }

@@ -7,11 +7,12 @@
     "wohin-site"
   ],
   "scripts": {
-    "dev": "bun x concurrently -n \"cms,backend,site\" -c \"cyan,yellow,magenta\" \"bun run --cwd wohin-cms dev\" \"bun run --cwd wohin-backend dev\" \"bun run --cwd wohin-site dev\"",
+    "dev:infra": "bun x concurrently -n \"cms,backend\" -c \"cyan,yellow\" \"bun run --cwd wohin-cms dev\" \"bun run --cwd wohin-backend dev\"",
     "dev:cms": "bun run --cwd wohin-cms dev",
     "dev:backend": "bun run --cwd wohin-backend dev",
-    "dev:mobile": "cd wohin-app && flutter run -d macos",
     "dev:site": "bun run --cwd wohin-site dev",
+    "dev:app": "cd wohin-app && flutter run",
+    "dev:mac": "cd wohin-app && flutter run -d macos",
     "install:all": "bun install"
   }
 }

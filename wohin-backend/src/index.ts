@@ -32,14 +32,18 @@ app.get("/api/v1/discovery/search", async (c) => {
   const activityId = c.req.query("activityId");
   const lat = c.req.query("lat");
   const lng = c.req.query("lng");
+  const themeColor = c.req.query("themeColor");
+  const keywords = c.req.query("keywords");
 
-  if (!q && !activityId) {
-    return c.json({ error: "Provide q or activityId" }, 400);
+  if (!q && !activityId && !themeColor && !keywords) {
+    return c.json({ error: "Provide q, activityId, themeColor, or keywords" }, 400);
   }
 
   const results = await DiscoveryService.searchLocations(c.env, c.env.DB, {
     q: q || undefined,
     activityId: activityId || undefined,
+    themeColor: (themeColor as any) || undefined,
+    keywords: keywords ? keywords.split(',') : undefined,
     userLat: lat ? parseFloat(lat) : undefined,
     userLng: lng ? parseFloat(lng) : undefined,
   });

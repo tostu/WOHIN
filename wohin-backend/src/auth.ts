@@ -10,6 +10,6 @@ export function createAuth(env: CloudflareBindings) {
     emailAndPassword: { enabled: true },
     database: drizzleAdapter(getDb(env.DB), { provider: "sqlite" }),
     plugins: [expo()],
-    trustedOrigins: ["http://192.168.178.45:8787", "http://localhost:8787"],
+    trustedOrigins: ["http://192.168.178.45:8787", "http://localhost:8787", "http://localhost:8081"],
   });
 }

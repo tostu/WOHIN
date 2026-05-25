@@ -66,12 +66,14 @@ export class DiscoveryService {
     params: {
       q?: string;
       activityId?: string;
+      themeColor?: "matcha" | "peach" | "sunny";
+      keywords?: string[];
       userLat?: number;
       userLng?: number;
     },
   ): Promise<LocationSearchResult[]> {
     const client = getSanityClient(env);
-    const { q, activityId, userLat, userLng } = params;
+    const { q, activityId, themeColor, keywords, userLat, userLng } = params;
 
     const filters = ['_type == "location"', 'status == "approved"'];
     const queryParams: Record<string, any> = {};
@@ -84,6 +86,21 @@ export class DiscoveryService {
     if (q) {
       filters.push("(name match $q || address match $q)");
       queryParams.q = `${q}*`;
+    }
+
+    if (themeColor || (keywords && keywords.length > 0)) {
+      const orConditions = [];
+      if (themeColor) {
+        orConditions.push(`$themeColor in activities[]->themeColor`);
+        queryParams.themeColor = themeColor;
+      }
+      if (keywords && keywords.length > 0) {
+        keywords.forEach((kw, i) => {
+          queryParams[`kw${i}`] = `${kw}*`;
+          orConditions.push(`name match $kw${i} || address match $kw${i}`);
+        });
+      }
+      filters.push(`(${orConditions.join(' || ')})`);
     }
 
     const query = `*[${filters.join(" && ")}]{

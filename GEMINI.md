@@ -40,4 +40,5 @@ SvelteKit 2 (TypeScript 5.x): Follow standard conventions
 - 001-wohin-pwa-discovery: Added SvelteKit 2 (TypeScript 5.x) + Tailwind CSS, Bits UI (Radix Svelte), MapLibre GL JS, Sanity Client/Image URL, Better-Auth (from app/), Drizzle ORM (from app/)
 
 <!-- MANUAL ADDITIONS START -->
+- Rebuilt WOHIN mobile app in Flutter (`wohin_flutter`) next to Expo (`wohin-app`) with Riverpod, flutter_map, and Dio.
 <!-- MANUAL ADDITIONS END -->
